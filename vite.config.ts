@@ -8,13 +8,7 @@ export default defineConfig({
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   plugins: [...mochaPlugins(process.env as any), react(), cloudflare()],
   server: {
-    host: '0.0.0.0',
-    port: 5173,
-    strictPort: true,
-    allowedHosts: [
-      '.manus-asia.computer',
-      '5173-itojhd2mr53cigs4pmoi0-a2c5a83e.manus-asia.computer'
-    ],
+    allowedHosts: true,
   },
   build: {
     chunkSizeWarningLimit: 5000,
