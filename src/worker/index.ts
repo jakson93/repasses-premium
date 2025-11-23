@@ -1,5 +1,5 @@
 import { Hono } from "hono";
-// import { handle } from "@hono/node-server/netlify"; // Removido: Usaremos o adaptador Edge
+// import { handle } from "hono/netlify"; // Removido: Usaremos o adaptador Edge
 import { setCookie } from "hono/cookie";
 import { getSupabaseClient } from "../../database";
 import { SupabaseClient } from "@supabase/supabase-js";
