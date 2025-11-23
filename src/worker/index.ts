@@ -1,5 +1,5 @@
 import { Hono } from "hono";
-// import { handle } from "hono/netlify"; // Removido: Usaremos o adaptador Edge
+// import { handle } from "@hono/node-server/netlify"; // Removido: Usaremos o adaptador Edge
 import { setCookie } from "hono/cookie";
 import { getSupabaseClient } from "../../database";
 import { SupabaseClient } from "@supabase/supabase-js";
@@ -443,6 +443,4 @@ app.delete("/api/images/:id", authMiddleware, async (c) => {
 
   return c.json({ success: true });
 });
-
-// Exportar o handler para o Netlify Functions
-export default app;
+// Exportar o handler para o Netlify Functions\nexport const handler = handle(app);
