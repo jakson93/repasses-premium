@@ -1,5 +1,7 @@
 import { getCookie } from "hono/cookie";
 import { createMiddleware } from "hono/factory";
+import { getSupabaseClient } from "../../database"; // Importação corrigida
+// import { Env } from "../worker-configuration"; // Removido para Netlify
 
 export const SESSION_COOKIE_NAME = "repasses_session";
 
@@ -44,7 +46,7 @@ export async function hashPassword(password: string): Promise<string> {
   return hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
 }
 
-export const authMiddleware = createMiddleware<{ Bindings: Env; Variables: { user: any } }>(async (c, next) => {
+export const authMiddleware = createMiddleware<{ Variables: { user: any } }>(async (c, next) => {
   const token = getCookie(c, SESSION_COOKIE_NAME);
 
   if (!token) {
@@ -57,12 +59,18 @@ export const authMiddleware = createMiddleware<{ Bindings: Env; Variables: { use
   }
 
   // Get user from database
-  const user = await c.env.DB.prepare(
-    "SELECT id, email, name, created_at FROM users WHERE id = ?"
-  )
-    .bind(session.userId)
-    .first();
+  const supabase = getSupabaseClient(c.env);
+  const { data: user, error } = await supabase
+    .from("users")
+    .select("id, email, name, created_at")
+    .eq("id", session.userId)
+    .single();
 
+  if (error) {
+    console.error("Supabase Error:", error);
+    return c.json({ error: "Database error" }, 500);
+  }  
+  
   if (!user) {
     return c.json({ error: "User not found" }, 401);
   }

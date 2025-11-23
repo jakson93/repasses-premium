@@ -1,5 +1,8 @@
 import { Hono } from "hono";
+import { handle } from "hono/netlify";
 import { setCookie } from "hono/cookie";
+import { getSupabaseClient } from "../../database";
+import { SupabaseClient } from "@supabase/supabase-js";
 import {
   CreateMotorcycleSchema,
   UpdateMotorcycleSchema,
@@ -14,12 +17,22 @@ import {
   SESSION_COOKIE_NAME 
 } from "./auth";
 
-const app = new Hono<{ Bindings: Env; Variables: { user: any } }>();
+// O Hono precisa de um tipo para o contexto, mas o Netlify Functions não usa Bindings
+// Usaremos um tipo genérico para o Hono e injetaremos o Supabase Client via Middleware
+const app = new Hono<{ Variables: { user: any; supabase: SupabaseClient } }>();
+
+// Middleware para injetar o Supabase Client no contexto
+app.use("*", async (c, next) => {
+  // c.env no Netlify Functions é o process.env
+  c.set("supabase", getSupabaseClient(c.env));
+  await next();
+});
 
 // Auth endpoints
 app.post("/api/auth/register", async (c) => {
   const body = await c.req.json();
   const { email, password, name } = body;
+  const supabase = c.get("supabase");
 
   if (!email || !password) {
     return c.json({ error: "Email e senha são obrigatórios" }, 400);
@@ -30,11 +43,11 @@ app.post("/api/auth/register", async (c) => {
   }
 
   // Check if user already exists
-  const existingUser = await c.env.DB.prepare(
-    "SELECT id FROM users WHERE email = ?"
-  )
-    .bind(email)
-    .first();
+  const { data: existingUser } = await supabase
+    .from("users")
+    .select("id")
+    .eq("email", email)
+    .single();
 
   if (existingUser) {
     return c.json({ error: "Este email já está cadastrado" }, 400);
@@ -43,13 +56,18 @@ app.post("/api/auth/register", async (c) => {
   // Hash password and create user
   const hashedPassword = await hashPassword(password);
   
-  const result = await c.env.DB.prepare(
-    "INSERT INTO users (email, password, name) VALUES (?, ?, ?)"
-  )
-    .bind(email, hashedPassword, name || null)
-    .run();
+  const { data: newUser, error: insertError } = await supabase
+    .from("users")
+    .insert({ email, password: hashedPassword, name: name || null })
+    .select("id")
+    .single();
 
-  const userId = result.meta.last_row_id as number;
+  if (insertError) {
+    console.error("Supabase Insert Error:", insertError);
+    return c.json({ error: "Erro ao criar usuário" }, 500);
+  }
+
+  const userId = newUser.id as number;
   const sessionToken = createSessionToken(userId, email);
 
   setCookie(c, SESSION_COOKIE_NAME, sessionToken, {
@@ -69,19 +87,21 @@ app.post("/api/auth/register", async (c) => {
 app.post("/api/auth/login", async (c) => {
   const body = await c.req.json();
   const { email, password } = body;
+  const supabase = c.get("supabase");
 
   if (!email || !password) {
     return c.json({ error: "Email e senha são obrigatórios" }, 400);
   }
 
   // Find user
-  const user = await c.env.DB.prepare(
-    "SELECT id, email, password, name FROM users WHERE email = ?"
-  )
-    .bind(email)
-    .first() as any;
+  const { data: user, error: fetchError } = await supabase
+    .from("users")
+    .select("id, email, password, name")
+    .eq("email", email)
+    .single();
 
-  if (!user) {
+  if (fetchError) {
+    console.error("Supabase Fetch Error:", fetchError);
     return c.json({ error: "Email ou senha inválidos" }, 401);
   }
 
@@ -126,6 +146,7 @@ app.post("/api/auth/logout", async (c) => {
 // Motorcycle endpoints
 app.get("/api/motorcycles", async (c) => {
   const query = c.req.query();
+  const supabase = c.get("supabase");
   const filters = MotorcycleFiltersSchema.parse({
     brand: query.brand || undefined,
     model: query.model || undefined,
@@ -142,102 +163,109 @@ app.get("/api/motorcycles", async (c) => {
     sortBy: query.sortBy as any || undefined,
   });
 
-  let sql = "SELECT * FROM motorcycles WHERE 1=1";
-  const params: any[] = [];
+  let queryBuilder = supabase.from("motorcycles").select("*");
 
   if (filters.brand) {
-    sql += " AND brand LIKE ?";
-    params.push(`%${filters.brand}%`);
+    queryBuilder = queryBuilder.ilike("brand", `%${filters.brand}%`);
   }
   if (filters.model) {
-    sql += " AND model LIKE ?";
-    params.push(`%${filters.model}%`);
+    queryBuilder = queryBuilder.ilike("model", `%${filters.model}%`);
   }
   if (filters.minYear) {
-    sql += " AND year >= ?";
-    params.push(filters.minYear);
+    queryBuilder = queryBuilder.gte("year", filters.minYear);
   }
   if (filters.maxYear) {
-    sql += " AND year <= ?";
-    params.push(filters.maxYear);
+    queryBuilder = queryBuilder.lte("year", filters.maxYear);
   }
   if (filters.minPrice) {
-    sql += " AND price >= ?";
-    params.push(filters.minPrice);
+    queryBuilder = queryBuilder.gte("price", filters.minPrice);
   }
   if (filters.maxPrice) {
-    sql += " AND price <= ?";
-    params.push(filters.maxPrice);
+    queryBuilder = queryBuilder.lte("price", filters.maxPrice);
   }
   if (filters.minMileage) {
-    sql += " AND mileage >= ?";
-    params.push(filters.minMileage);
+    queryBuilder = queryBuilder.gte("mileage", filters.minMileage);
   }
   if (filters.maxMileage) {
-    sql += " AND mileage <= ?";
-    params.push(filters.maxMileage);
+    queryBuilder = queryBuilder.lte("mileage", filters.maxMileage);
   }
   if (filters.minDisplacement) {
-    sql += " AND displacement >= ?";
-    params.push(filters.minDisplacement);
+    queryBuilder = queryBuilder.gte("displacement", filters.minDisplacement);
   }
   if (filters.maxDisplacement) {
-    sql += " AND displacement <= ?";
-    params.push(filters.maxDisplacement);
+    queryBuilder = queryBuilder.lte("displacement", filters.maxDisplacement);
   }
   if (filters.condition) {
-    sql += " AND condition = ?";
-    params.push(filters.condition);
+    queryBuilder = queryBuilder.eq("condition", filters.condition);
   }
   if (filters.is_financed !== undefined) {
-    sql += " AND is_financed = ?";
-    params.push(filters.is_financed ? 1 : 0);
+    queryBuilder = queryBuilder.eq("is_financed", filters.is_financed);
   }
 
   // Sorting
   if (filters.sortBy === "price_asc") {
-    sql += " ORDER BY price ASC";
+    queryBuilder = queryBuilder.order("price", { ascending: true });
   } else if (filters.sortBy === "price_desc") {
-    sql += " ORDER BY price DESC";
+    queryBuilder = queryBuilder.order("price", { ascending: false });
   } else if (filters.sortBy === "year_asc") {
-    sql += " ORDER BY year ASC";
+    queryBuilder = queryBuilder.order("year", { ascending: true });
   } else if (filters.sortBy === "year_desc") {
-    sql += " ORDER BY year DESC";
+    queryBuilder = queryBuilder.order("year", { ascending: false });
   } else {
-    sql += " ORDER BY created_at DESC";
+    queryBuilder = queryBuilder.order("created_at", { ascending: false });
   }
 
-  const { results } = await c.env.DB.prepare(sql).bind(...params).all();
+  const { data: results, error } = await queryBuilder;
+
+  if (error) {
+    console.error("Supabase Query Error:", error);
+    return c.json({ error: "Database query failed" }, 500);
+  }
 
   return c.json(results);
 });
 
 app.get("/api/motorcycles/featured", async (c) => {
-  const { results } = await c.env.DB.prepare(
-    "SELECT * FROM motorcycles WHERE is_featured = 1 ORDER BY created_at DESC LIMIT 6"
-  ).all();
+  const supabase = c.get("supabase");
+  const { data: results, error } = await supabase
+    .from("motorcycles")
+    .select("*")
+    .eq("is_featured", true)
+    .order("created_at", { ascending: false })
+    .limit(6);
+
+  if (error) {
+    console.error("Supabase Query Error:", error);
+    return c.json({ error: "Database query failed" }, 500);
+  }
 
   return c.json(results);
 });
 
 app.get("/api/motorcycles/:id", async (c) => {
   const id = c.req.param("id");
+  const supabase = c.get("supabase");
 
-  const motorcycle = await c.env.DB.prepare(
-    "SELECT * FROM motorcycles WHERE id = ?"
-  )
-    .bind(id)
-    .first();
+  const { data: motorcycle, error: motoError } = await supabase
+    .from("motorcycles")
+    .select("*")
+    .eq("id", id)
+    .single();
 
-  if (!motorcycle) {
+  if (motoError || !motorcycle) {
     return c.json({ error: "Motorcycle not found" }, 404);
   }
 
-  const { results: images } = await c.env.DB.prepare(
-    "SELECT * FROM motorcycle_images WHERE motorcycle_id = ? ORDER BY display_order ASC"
-  )
-    .bind(id)
-    .all();
+  const { data: images, error: imagesError } = await supabase
+    .from("motorcycle_images")
+    .select("*")
+    .eq("motorcycle_id", id)
+    .order("display_order", { ascending: true });
+
+  if (imagesError) {
+    console.error("Supabase Images Query Error:", imagesError);
+    return c.json({ error: "Database query failed" }, 500);
+  }
 
   const motorcycleWithImages: MotorcycleWithImages = {
     ...motorcycle as Motorcycle,
@@ -250,86 +278,66 @@ app.get("/api/motorcycles/:id", async (c) => {
 app.post("/api/motorcycles", authMiddleware, async (c) => {
   const body = await c.req.json();
   const data = CreateMotorcycleSchema.parse(body);
+  const supabase = c.get("supabase");
 
-  const result = await c.env.DB.prepare(
-    `INSERT INTO motorcycles (
-      brand, model, year, color, mileage, displacement, price, description,
-      condition, payment_methods, features, is_featured, is_financed, is_overdue,
-      finance_days_remaining, finance_monthly_payment, finance_total_remaining,
-      is_worth_financing
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
-  )
-    .bind(
-      data.brand,
-      data.model,
-      data.year,
-      data.color || null,
-      data.mileage || null,
-      data.displacement || null,
-      data.price,
-      data.description || null,
-      data.condition || null,
-      data.payment_methods || null,
-      data.features || null,
-      data.is_featured ? 1 : 0,
-      data.is_financed ? 1 : 0,
-      data.is_overdue ? 1 : 0,
-      data.finance_days_remaining || null,
-      data.finance_monthly_payment || null,
-      data.finance_total_remaining || null,
-      data.is_worth_financing ? 1 : 0
-    )
-    .run();
+  const insertData = {
+    ...data,
+    is_featured: data.is_featured ? true : false,
+    is_financed: data.is_financed ? true : false,
+    is_overdue: data.is_overdue ? true : false,
+    is_worth_financing: data.is_worth_financing ? true : false,
+  };
 
-  return c.json({ id: result.meta.last_row_id }, 201);
+  const { data: newMoto, error } = await supabase
+    .from("motorcycles")
+    .insert(insertData)
+    .select("id")
+    .single();
+
+  if (error) {
+    console.error("Supabase Insert Error:", error);
+    return c.json({ error: "Database insert failed" }, 500);
+  }
+
+  return c.json({ id: newMoto.id }, 201);
 });
 
 app.put("/api/motorcycles/:id", authMiddleware, async (c) => {
   const id = c.req.param("id");
   const body = await c.req.json();
   const data = UpdateMotorcycleSchema.parse(body);
+  const supabase = c.get("supabase");
 
-  const updates: string[] = [];
-  const params: any[] = [];
+  const updateData = { ...data };
 
-  Object.entries(data).forEach(([key, value]) => {
-    if (value !== undefined) {
-      if (key === "is_featured" || key === "is_financed" || key === "is_overdue" || key === "is_worth_financing") {
-        updates.push(`${key} = ?`);
-        params.push(value ? 1 : 0);
-      } else {
-        updates.push(`${key} = ?`);
-        params.push(value);
-      }
-    }
-  });
+  // Convert 1/0 to boolean for Supabase
+  if (updateData.is_featured !== undefined) updateData.is_featured = updateData.is_featured ? true : false;
+  if (updateData.is_financed !== undefined) updateData.is_financed = updateData.is_financed ? true : false;
+  if (updateData.is_overdue !== undefined) updateData.is_overdue = updateData.is_overdue ? true : false;
+  if (updateData.is_worth_financing !== undefined) updateData.is_worth_financing = updateData.is_worth_financing ? true : false;
 
-  if (updates.length === 0) {
-    return c.json({ error: "No fields to update" }, 400);
+  const { error } = await supabase
+    .from("motorcycles")
+    .update({ ...updateData, updated_at: new Date().toISOString() })
+    .eq("id", id);
+
+  if (error) {
+    console.error("Supabase Update Error:", error);
+    return c.json({ error: "Database update failed" }, 500);
   }
-
-  updates.push("updated_at = CURRENT_TIMESTAMP");
-  params.push(id);
-
-  await c.env.DB.prepare(
-    `UPDATE motorcycles SET ${updates.join(", ")} WHERE id = ?`
-  )
-    .bind(...params)
-    .run();
 
   return c.json({ success: true });
 });
 
 app.delete("/api/motorcycles/:id", authMiddleware, async (c) => {
   const id = c.req.param("id");
+  const supabase = c.get("supabase");
 
-  await c.env.DB.prepare("DELETE FROM motorcycle_images WHERE motorcycle_id = ?")
-    .bind(id)
-    .run();
+  // Delete images
+  await supabase.from("motorcycle_images").delete().eq("motorcycle_id", id);
 
-  await c.env.DB.prepare("DELETE FROM motorcycles WHERE id = ?")
-    .bind(id)
-    .run();
+  // Delete motorcycle
+  await supabase.from("motorcycles").delete().eq("id", id);
 
   return c.json({ success: true });
 });
@@ -339,81 +347,102 @@ app.post("/api/motorcycles/:id/images", authMiddleware, async (c) => {
   const id = c.req.param("id");
   const formData = await c.req.formData();
   const file = formData.get("image") as File;
+  const supabase = c.get("supabase");
   
   if (!file) {
     return c.json({ error: "No image provided" }, 400);
   }
 
-  const arrayBuffer = await file.arrayBuffer();
   const filename = `motorcycles/${id}/${Date.now()}-${file.name}`;
 
-  await c.env.R2_BUCKET.put(filename, arrayBuffer, {
-    httpMetadata: {
-      contentType: file.type,
-    },
-  });
+  // Upload to Supabase Storage
+  const { error: uploadError } = await supabase.storage
+    .from("motorcycle_images") // Assumindo que você tem um bucket chamado 'motorcycle_images'
+    .upload(filename, file, { contentType: file.type });
 
-  const imageUrl = `/api/files/${filename}`;
+  if (uploadError) {
+    console.error("Supabase Upload Error:", uploadError);
+    return c.json({ error: "Failed to upload image" }, 500);
+  }
 
-  const result = await c.env.DB.prepare(
-    "INSERT INTO motorcycle_images (motorcycle_id, image_url, display_order) VALUES (?, ?, ?)"
-  )
-    .bind(id, imageUrl, 0)
-    .run();
+  // Get public URL
+  const { data: publicUrlData } = supabase.storage
+    .from("motorcycle_images")
+    .getPublicUrl(filename);
 
-  return c.json({ id: result.meta.last_row_id, image_url: imageUrl }, 201);
+  const imageUrl = publicUrlData.publicUrl;
+
+  // Insert image record into database
+  const { data: newImage, error: insertError } = await supabase
+    .from("motorcycle_images")
+    .insert({ motorcycle_id: id, image_url: imageUrl, display_order: 0 })
+    .select("id")
+    .single();
+
+  if (insertError) {
+    console.error("Supabase Insert Error:", insertError);
+    return c.json({ error: "Failed to record image in database" }, 500);
+  }
+
+  return c.json({ id: newImage.id, image_url: imageUrl }, 201);
 });
 
 app.put("/api/motorcycles/:id/thumbnail", authMiddleware, async (c) => {
   const id = c.req.param("id");
   const body = await c.req.json();
+  const supabase = c.get("supabase");
   
-  await c.env.DB.prepare(
-    "UPDATE motorcycles SET thumbnail_url = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?"
-  )
-    .bind(body.thumbnail_url, id)
-    .run();
+  const { error } = await supabase
+    .from("motorcycles")
+    .update({ thumbnail_url: body.thumbnail_url, updated_at: new Date().toISOString() })
+    .eq("id", id);
+
+  if (error) {
+    console.error("Supabase Update Error:", error);
+    return c.json({ error: "Database update failed" }, 500);
+  }
 
   return c.json({ success: true });
 });
 
 app.delete("/api/images/:id", authMiddleware, async (c) => {
   const id = c.req.param("id");
+  const supabase = c.get("supabase");
 
-  const image = await c.env.DB.prepare(
-    "SELECT * FROM motorcycle_images WHERE id = ?"
-  )
-    .bind(id)
-    .first() as any;
+  const { data: image, error: fetchError } = await supabase
+    .from("motorcycle_images")
+    .select("image_url")
+    .eq("id", id)
+    .single();
 
-  if (!image) {
+  if (fetchError || !image) {
     return c.json({ error: "Image not found" }, 404);
   }
 
-  const filename = image.image_url.replace("/api/files/", "");
-  await c.env.R2_BUCKET.delete(filename);
+  // Delete from Supabase Storage
+  const filename = image.image_url.split("/").pop(); // Simplificação: assume que o nome do arquivo é o último segmento da URL
+  const { error: deleteStorageError } = await supabase.storage
+    .from("motorcycle_images")
+    .remove([`motorcycles/${id}/${filename}`]); // O caminho exato pode precisar de ajuste
 
-  await c.env.DB.prepare("DELETE FROM motorcycle_images WHERE id = ?")
-    .bind(id)
-    .run();
+  if (deleteStorageError) {
+    console.error("Supabase Storage Delete Error:", deleteStorageError);
+    // Continua para deletar o registro do DB mesmo que o arquivo não seja deletado
+  }
+
+  // Delete from database
+  const { error: deleteDbError } = await supabase
+    .from("motorcycle_images")
+    .delete()
+    .eq("id", id);
+
+  if (deleteDbError) {
+    console.error("Supabase DB Delete Error:", deleteDbError);
+    return c.json({ error: "Failed to delete image record" }, 500);
+  }
 
   return c.json({ success: true });
 });
 
-// File serving endpoint
-app.get("/api/files/*", async (c) => {
-  const path = c.req.path.replace("/api/files/", "");
-  const object = await c.env.R2_BUCKET.get(path);
-
-  if (!object) {
-    return c.json({ error: "File not found" }, 404);
-  }
-
-  const headers = new Headers();
-  object.writeHttpMetadata(headers);
-  headers.set("etag", object.httpEtag);
-
-  return c.body(object.body, { headers });
-});
-
-export default app;
+// Exportar o handler para o Netlify Functions
+export const handler = handle(app);
