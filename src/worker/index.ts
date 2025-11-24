@@ -353,7 +353,6 @@ app.post("/api/motorcycles/:id/images", authMiddleware, async (c) => {
     success: true,
     url: supabase.storage.from("motorcycle_images").getPublicUrl(filename).data.publicUrl
   });
-}); 
 });
 
 app.put("/api/motorcycles/:id/thumbnail", authMiddleware, async (c) => {
