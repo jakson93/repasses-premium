@@ -13,5 +13,5 @@ build({
   platform: 'node',
   target: 'node20',
   format: 'esm',
-  external: ['@hono/node-server/netlify'],
+  external: [],
 }).catch(() => process.exit(1));
