@@ -1,4 +1,4 @@
-import { getCookie } from "hono/cookie";
+
 import { createMiddleware } from "hono/factory";
 import { getSupabaseClient } from "../../database";
 import { SupabaseClient } from "@supabase/supabase-js";

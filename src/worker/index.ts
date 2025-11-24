@@ -1,7 +1,8 @@
 import { Hono } from "hono";
 // import { handle } from "hono/netlify"; // Removido: Usaremos o adaptador Edge
-import { setCookie } from "hono/cookie";
+
 import { getSupabaseClient } from "../../database";
+import { SupabaseClient } from "@supabase/supabase-js";
 
 import {
   CreateMotorcycleSchema,
@@ -12,7 +13,6 @@ import {
 } from "@/shared/types";
 import { 
   authMiddleware, 
-  SESSION_COOKIE_NAME 
 } from "./auth";
 
 // O Hono precisa de um tipo para o contexto, mas o Netlify Functions não usa Bindings
