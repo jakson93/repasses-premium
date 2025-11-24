@@ -6,7 +6,7 @@ build({
     '@': './src',
   },
   footer: {
-    js: "const { handle } = require('@hono/node-server/netlify'); module.exports.handler = handle(app);",
+    js: "const { handle } = require('@hono/netlify'); module.exports.handler = handle(app);",
   },
   bundle: true,
   outfile: 'netlify/functions/index.js',
