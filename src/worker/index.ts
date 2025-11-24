@@ -225,16 +225,23 @@ app.get("/api/motorcycles/:id", async (c) => {
     return c.json({ error: "Motorcycle not found" }, 404);
   }
 
-  const { data: images, error: imagesError } = await supabase
+  // Buscar URLs das imagens no Supabase Storage
+  const { data: imageList, error: storageError } = await supabase.storage
     .from("motorcycle_images")
-    .select("*")
-    .eq("motorcycle_id", id)
-    .order("display_order", { ascending: true });
+    .list(`motorcycles/${id}`, {
+      limit: 100,
+      sortBy: { column: 'name', order: 'asc' },
+    });
 
-  if (imagesError) {
-    console.error("Supabase Images Query Error:", imagesError);
-    return c.json({ error: "Database query failed" }, 500);
+  if (storageError) {
+    console.error("Supabase Storage Error:", storageError);
+    return c.json({ error: "Storage query failed" }, 500);
   }
+
+  const images = imageList.map(file => ({
+    url: `${supabase.storage.from("motorcycle_images").getPublicUrl(`motorcycles/${id}/${file.name}`).data.publicUrl}`,
+    name: file.name,
+  }));
 
   const motorcycleWithImages: MotorcycleWithImages = {
     ...motorcycle as Motorcycle,
@@ -302,10 +309,17 @@ app.delete("/api/motorcycles/:id", authMiddleware, async (c) => {
   const id = c.req.param("id");
   const supabase = c.get("supabase");
 
-  // Delete images
-  await supabase.from("motorcycle_images").delete().eq("motorcycle_id", id);
+  // Delete images from Storage
+  const { data: imageList } = await supabase.storage
+    .from("motorcycle_images")
+    .list(`motorcycles/${id}`);
 
-  // Delete motorcycle
+  if (imageList) {
+    const filesToRemove = imageList.map(file => `motorcycles/${id}/${file.name}`);
+    await supabase.storage.from("motorcycle_images").remove(filesToRemove);
+  }
+
+  // Delete motorcycle from database
   await supabase.from("motorcycles").delete().eq("id", id);
 
   return c.json({ success: true });
@@ -331,29 +345,15 @@ app.post("/api/motorcycles/:id/images", authMiddleware, async (c) => {
 
   if (uploadError) {
     console.error("Supabase Upload Error:", uploadError);
-    return c.json({ error: "Failed to upload image" }, 500);
+    return c.json({ error: "Image upload failed" }, 500);
   }
 
-  // Get public URL
-  const { data: publicUrlData } = supabase.storage
-    .from("motorcycle_images")
-    .getPublicUrl(filename);
-
-  const imageUrl = publicUrlData.publicUrl;
-
-  // Insert image record into database
-  const { data: newImage, error: insertError } = await supabase
-    .from("motorcycle_images")
-    .insert({ motorcycle_id: id, image_url: imageUrl, display_order: 0 })
-    .select("id")
-    .single();
-
-  if (insertError) {
-    console.error("Supabase Insert Error:", insertError);
-    return c.json({ error: "Failed to record image in database" }, 500);
-  }
-
-  return c.json({ id: newImage.id, image_url: imageUrl }, 201);
+  // Não é mais necessário salvar a referência no banco de dados, pois usamos o Storage
+  return c.json({ 
+    success: true,
+    url: supabase.storage.from("motorcycle_images").getPublicUrl(filename).data.publicUrl
+  });
+}); return c.json({ id: newImage.id, image_url: imageUrl }, 201);
 });
 
 app.put("/api/motorcycles/:id/thumbnail", authMiddleware, async (c) => {
