@@ -2,7 +2,7 @@ import { Hono } from "hono";
 // import { handle } from "hono/netlify"; // Removido: Usaremos o adaptador Edge
 import { setCookie } from "hono/cookie";
 import { getSupabaseClient } from "../../database";
-import { SupabaseClient } from "@supabase/supabase-js";
+
 import {
   CreateMotorcycleSchema,
   UpdateMotorcycleSchema,
@@ -12,8 +12,6 @@ import {
 } from "@/shared/types";
 import { 
   authMiddleware, 
-  createSessionToken, 
-  hashPassword, 
   SESSION_COOKIE_NAME 
 } from "./auth";
 
@@ -21,10 +19,13 @@ import {
 // Usaremos um tipo genérico para o Hono e injetaremos o Supabase Client via Middleware
 const app = new Hono<{ Variables: { user: any; supabase: SupabaseClient } }>();
 
-// Middleware para injetar o Supabase Client no contexto
-app.use("*", async (c, next) => {
-  // c.env no Netlify Functions é o process.env
-  c.set("supabase", getSupabaseClient());
+// Middleware para injetar o Supabase Client no contexto (apenas se não estiver no authMiddleware)
+// Como o authMiddleware agora injeta o supabase client, este middleware não é mais necessário.
+// Se o endpoint não usar authMiddleware, o cliente precisa ser injetado.
+app.use("/api/motorcycles/*", async (c, next) => {
+  if (!c.get("supabase")) {
+    c.set("supabase", getSupabaseClient());
+  }
   await next();
 });
 
@@ -32,7 +33,7 @@ app.use("*", async (c, next) => {
 app.post("/api/auth/register", async (c) => {
   const body = await c.req.json();
   const { email, password, name } = body;
-  const supabase = c.get("supabase");
+  const supabase = getSupabaseClient(); // Usar o cliente padrão
 
   if (!email || !password) {
     return c.json({ error: "Email e senha são obrigatórios" }, 400);
@@ -42,103 +43,71 @@ app.post("/api/auth/register", async (c) => {
     return c.json({ error: "A senha deve ter pelo menos 6 caracteres" }, 400);
   }
 
-  // Check if user already exists
-  const { data: existingUser } = await supabase
-    .from("users")
-    .select("id")
-    .eq("email", email)
-    .single();
-
-  if (existingUser) {
-    return c.json({ error: "Este email já está cadastrado" }, 400);
-  }
-
-  // Hash password and create user
-  const hashedPassword = await hashPassword(password);
-  
-  const { data: newUser, error: insertError } = await supabase
-    .from("users")
-    .insert({ email, password: hashedPassword, name: name || null })
-    .select("id")
-    .single();
-
-  if (insertError) {
-    console.error("Supabase Insert Error:", insertError);
-    return c.json({ error: "Erro ao criar usuário" }, 500);
-  }
-
-  const userId = newUser.id as number;
-  const sessionToken = createSessionToken(userId, email);
-
-  setCookie(c, SESSION_COOKIE_NAME, sessionToken, {
-    httpOnly: true,
-    path: "/",
-    sameSite: "none",
-    secure: true,
-    maxAge: 30 * 24 * 60 * 60, // 30 days
+  // Usar a autenticação nativa do Supabase
+  const { data: { user }, error: signUpError } = await supabase.auth.signUp({
+    email,
+    password,
+    options: {
+      data: { name: name || null } // Adicionar metadados
+    }
   });
 
+  if (signUpError) {
+    console.error("Supabase SignUp Error:", signUpError);
+    return c.json({ error: signUpError.message }, 500);
+  }
+
+  // O Supabase já cuida da sessão e cookies.
   return c.json({ 
     success: true,
-    user: { id: userId, email, name }
+    user: { id: user?.id, email: user?.email, name: user?.user_metadata.name }
   }, 201);
 });
 
 app.post("/api/auth/login", async (c) => {
   const body = await c.req.json();
   const { email, password } = body;
-  const supabase = c.get("supabase");
+  const supabase = getSupabaseClient(); // Usar o cliente padrão
 
   if (!email || !password) {
     return c.json({ error: "Email e senha são obrigatórios" }, 400);
   }
 
-  // Find user
-  const { data: user, error: fetchError } = await supabase
-    .from("users")
-    .select("id, email, password, name")
-    .eq("email", email)
-    .single();
-
-  if (fetchError) {
-    console.error("Supabase Fetch Error:", fetchError);
-    return c.json({ error: "Email ou senha inválidos" }, 401);
-  }
-
-  // Verify password
-  const hashedPassword = await hashPassword(password);
-  if (hashedPassword !== user.password) {
-    return c.json({ error: "Email ou senha inválidos" }, 401);
-  }
-
-  const sessionToken = createSessionToken(user.id, user.email);
-
-  setCookie(c, SESSION_COOKIE_NAME, sessionToken, {
-    httpOnly: true,
-    path: "/",
-    sameSite: "none",
-    secure: true,
-    maxAge: 30 * 24 * 60 * 60, // 30 days
+  // Usar a autenticação nativa do Supabase
+  const { data: { user }, error: signInError } = await supabase.auth.signInWithPassword({
+    email,
+    password,
   });
 
+  if (signInError) {
+    console.error("Supabase SignIn Error:", signInError);
+    return c.json({ error: "Email ou senha inválidos" }, 401);
+  }
+
+  // O Supabase já cuida da sessão e cookies.
   return c.json({ 
     success: true,
-    user: { id: user.id, email: user.email, name: user.name }
+    user: { id: user?.id, email: user?.email, name: user?.user_metadata.name }
   });
 });
 
 app.get("/api/users/me", authMiddleware, async (c) => {
-  return c.json(c.get("user"));
+  const user = c.get("user");
+  return c.json({
+    id: user.id,
+    email: user.email,
+    name: user.user_metadata.name,
+  });
 });
 
 app.post("/api/auth/logout", async (c) => {
-  setCookie(c, SESSION_COOKIE_NAME, "", {
-    httpOnly: true,
-    path: "/",
-    sameSite: "none",
-    secure: true,
-    maxAge: 0,
-  });
+  const supabase = getSupabaseClient();
+  const { error } = await supabase.auth.signOut();
+
+  if (error) {
+    console.error("Supabase SignOut Error:", error);
+    return c.json({ error: "Erro ao fazer logout" }, 500);
+  }
 
   return c.json({ success: true });
 });
