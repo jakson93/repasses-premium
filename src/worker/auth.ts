@@ -59,7 +59,7 @@ export const authMiddleware = createMiddleware<{ Variables: { user: any } }>(asy
   }
 
   // Get user from database
-  const supabase = getSupabaseClient(c.env);
+  const supabase = getSupabaseClient();
   const { data: user, error } = await supabase
     .from("users")
     .select("id, email, name, created_at")
