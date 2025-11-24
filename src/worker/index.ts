@@ -24,7 +24,7 @@ const app = new Hono<{ Variables: { user: any; supabase: SupabaseClient } }>();
 // Middleware para injetar o Supabase Client no contexto
 app.use("*", async (c, next) => {
   // c.env no Netlify Functions é o process.env
-  c.set("supabase", getSupabaseClient(c.env));
+  c.set("supabase", getSupabaseClient());
   await next();
 });
 
