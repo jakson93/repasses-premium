@@ -3,7 +3,7 @@
   "compilerOptions": {
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.worker.tsbuildinfo",
     "lib": ["ES2023", "WebWorker"],
-    "types": ["vite/client", "./worker-configuration.d.ts", "@cloudflare/workers-types", "node"],
+    "types": ["vite/client", "@cloudflare/workers-types", "node"],
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]
