@@ -6,12 +6,12 @@ build({
     '@': './src',
   },
   footer: {
-    js: "import { handle } from '@hono/node-server/netlify'; export const handler = handle(app);",
+    js: "const { handle } = require('@hono/node-server/netlify'); module.exports.handler = handle(app);",
   },
   bundle: true,
   outfile: 'netlify/functions/index.js',
   platform: 'node',
-  target: 'node20',
-  format: 'esm',
+  target: 'node18',
+  format: 'cjs',
   external: [],
 }).catch(() => process.exit(1));
