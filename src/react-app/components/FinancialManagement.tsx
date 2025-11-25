@@ -370,7 +370,7 @@ await apiDelete(`/api/financial/records/${id}`);
           className="px-4 py-3 rounded-xl bg-black border border-yellow-500/30 text-white focus:outline-none focus:border-yellow-500 transition-colors duration-200"
         >
           <option value="all">Todas as Categorias</option>
-          {Object.keys(summary.categorias).map(category => (
+          {Object.keys(summary.categorias || {}).map(category => (
             <option key={category} value={category}>{category}</option>
           ))}
         </select>
