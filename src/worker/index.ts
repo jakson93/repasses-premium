@@ -414,4 +414,4 @@ app.delete("/api/images/:id", authMiddleware, async (c) => {
 
 
 // Exportar o handler para o Netlify Edge Functions
-export default app;
+export default app.fetch;
