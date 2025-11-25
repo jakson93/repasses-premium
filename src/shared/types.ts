@@ -52,6 +52,7 @@ export const CreateMotorcycleSchema = z.object({
   condition: z.string().optional(),
   payment_methods: z.string().optional(),
   features: z.string().optional(),
+  status: z.string().optional(),
   is_featured: z.boolean().optional(),
   is_financed: z.boolean().optional(),
   is_overdue: z.boolean().optional(),

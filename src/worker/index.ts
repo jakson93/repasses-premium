@@ -287,11 +287,19 @@ app.get("/api/financial/records", authMiddleware, async (c) => {
 app.post("/api/financial/records", authMiddleware, async (c) => {
   try {
     const body = await c.req.json();
-    const supabase = c.get("supabase");
+    const accessToken = c.get("accessToken");
+    const supabase = getSupabaseClientWithAuth(accessToken);
+
+    // Garantir que o campo date seja populado
+    const insertData = {
+      ...body,
+      date: body.date || new Date().toISOString().split('T')[0],
+      transaction_date: body.transaction_date || new Date().toISOString(),
+    };
 
     const { data, error } = await supabase
       .from("transactions")
-      .insert(body)
+      .insert(insertData)
       .select()
       .single();
 
@@ -303,6 +311,60 @@ app.post("/api/financial/records", authMiddleware, async (c) => {
     return c.json(data, 201);
   } catch (error) {
     console.error("Create transaction error:", error);
+    return c.json({ error: "Erro interno no servidor" }, 500);
+  }
+});
+
+app.put("/api/financial/records/:id", authMiddleware, async (c) => {
+  try {
+    const id = c.req.param("id");
+    const body = await c.req.json();
+    const accessToken = c.get("accessToken");
+    const supabase = getSupabaseClientWithAuth(accessToken);
+
+    const updateData = {
+      ...body,
+      updated_at: new Date().toISOString(),
+    };
+
+    const { data, error } = await supabase
+      .from("transactions")
+      .update(updateData)
+      .eq("id", id)
+      .select()
+      .single();
+
+    if (error) {
+      console.error("Error updating transaction:", error);
+      return c.json({ error: "Erro ao atualizar registro financeiro" }, 500);
+    }
+
+    return c.json(data);
+  } catch (error) {
+    console.error("Update transaction error:", error);
+    return c.json({ error: "Erro interno no servidor" }, 500);
+  }
+});
+
+app.delete("/api/financial/records/:id", authMiddleware, async (c) => {
+  try {
+    const id = c.req.param("id");
+    const accessToken = c.get("accessToken");
+    const supabase = getSupabaseClientWithAuth(accessToken);
+
+    const { error } = await supabase
+      .from("transactions")
+      .delete()
+      .eq("id", id);
+
+    if (error) {
+      console.error("Error deleting transaction:", error);
+      return c.json({ error: "Erro ao deletar registro financeiro" }, 500);
+    }
+
+    return c.json({ success: true });
+  } catch (error) {
+    console.error("Delete transaction error:", error);
     return c.json({ error: "Erro interno no servidor" }, 500);
   }
 });
@@ -626,12 +688,31 @@ app.post("/api/motorcycles", authMiddleware, async (c) => {
     const { data: newMoto, error } = await supabase
       .from("motorcycles")
       .insert(insertData)
-      .select("id")
+      .select("id, brand, model, price")
       .single();
 
     if (error) {
       console.error("Supabase Insert Error:", error);
       return c.json({ error: "Erro ao criar moto" }, 500);
+    }
+
+    // Criar transacao de entrada automaticamente
+    if (newMoto.price && newMoto.price > 0) {
+      try {
+        await supabase
+          .from("transactions")
+          .insert({
+            motorcycle_id: newMoto.id,
+            type: "purchase",
+            amount: newMoto.price,
+            category: "Aquisicao",
+            description: `Aquisicao de ${newMoto.brand} ${newMoto.model}`,
+            date: new Date().toISOString().split('T')[0],
+            transaction_date: new Date().toISOString(),
+          });
+      } catch (transError) {
+        console.error("Error creating transaction:", transError);
+      }
     }
 
     return c.json({ id: newMoto.id }, 201);
@@ -645,17 +726,28 @@ app.put("/api/motorcycles/:id", authMiddleware, async (c) => {
   try {
     const id = c.req.param("id");
     const body = await c.req.json();
-    const data = UpdateMotorcycleSchema.parse(body);
     const accessToken = c.get("accessToken");
     const supabase = getSupabaseClientWithAuth(accessToken);
 
-    const updateData = { ...data };
+    // Buscar moto atual para verificar mudanca de status
+    const { data: currentMoto } = await supabase
+      .from("motorcycles")
+      .select("status, brand, model, price")
+      .eq("id", id)
+      .single();
+
+    const updateData: any = { ...body };
 
     // Convert to boolean for Supabase
     if (updateData.is_featured !== undefined) updateData.is_featured = updateData.is_featured ? true : false;
     if (updateData.is_financed !== undefined) updateData.is_financed = updateData.is_financed ? true : false;
     if (updateData.is_overdue !== undefined) updateData.is_overdue = updateData.is_overdue ? true : false;
     if (updateData.is_worth_financing !== undefined) updateData.is_worth_financing = updateData.is_worth_financing ? true : false;
+
+    // Se status mudou para vendida, adicionar sold_at
+    if (updateData.status === "vendida" && currentMoto?.status !== "vendida") {
+      updateData.sold_at = new Date().toISOString();
+    }
 
     const { error } = await supabase
       .from("motorcycles")
@@ -665,6 +757,25 @@ app.put("/api/motorcycles/:id", authMiddleware, async (c) => {
     if (error) {
       console.error("Supabase Update Error:", error);
       return c.json({ error: "Erro ao atualizar moto" }, 500);
+    }
+
+    // Se moto foi vendida, criar transacao de venda
+    if (updateData.status === "vendida" && currentMoto?.status !== "vendida" && currentMoto?.price) {
+      try {
+        await supabase
+          .from("transactions")
+          .insert({
+            motorcycle_id: parseInt(id),
+            type: "sale",
+            amount: currentMoto.price,
+            category: "Venda",
+            description: `Venda de ${currentMoto.brand} ${currentMoto.model}`,
+            date: new Date().toISOString().split('T')[0],
+            transaction_date: new Date().toISOString(),
+          });
+      } catch (transError) {
+        console.error("Error creating sale transaction:", transError);
+      }
     }
 
     return c.json({ success: true });
