@@ -10,7 +10,7 @@
 
 ```env
 SUPABASE_URL=https://glfmvdjlbxoxbpfukapx.supabase.co
-SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdsZm12ZGpsYnhveGJwZnVrYXB4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQwNTg5MzMsImV4cCI6MjA3OTYzNDkzM30.DtgsMz7CW8v5GGdI_xsjubFWR939ajnXhcetCNzemA8
+SUPABASE_ANON_KEY=SEU_SUPABASE_ANON_KEY
 ```
 
 ### 2️⃣ Fazer Deploy

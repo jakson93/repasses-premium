@@ -18,7 +18,7 @@ Sistema completo de gestão de motos para revenda, com catálogo online, control
 
 ```env
 SUPABASE_URL=https://glfmvdjlbxoxbpfukapx.supabase.co
-SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+SUPABASE_ANON_KEY=SEU_SUPABASE_ANON_KEY
 ```
 
 ### 2. Faça o deploy

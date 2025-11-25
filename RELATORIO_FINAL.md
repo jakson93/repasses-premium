@@ -23,9 +23,9 @@ As correções foram enviadas para o seu repositório no GitHub. Para que o depl
 
 | Variável | Valor | Descrição |
 | :--- | :--- | :--- |
-| `VITE_SUPABASE_URL` | `https://ufmfkqsqyzsfmuhjmfen.supabase.co` | URL da API do seu projeto Supabase. |
-| `VITE_SUPABASE_ANON_KEY` | `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVmbWZrcXNxeXpzZm11aGptZmVuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM3NzMyODMsImV4cCI6MjA3OTM0OTI4M30.xc2mAopAoctEqvjtnINeVIyg_4tOQKyY6Y1SGnn91EI` | Chave pública (Anon Key) do seu projeto Supabase. |
-| `SUPABASE_SERVICE_ROLE_KEY` | `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVmbWZrcXNxeXpzZm11aGptZmVuIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2Mzc3MzI4MywiZXhwIjoyMDc5MzQ5MjgzfQ.cKlkFQDuIDwi2DvttzgcAj9uU5MR_EGaJqJqxRDnQLk` | **Chave Secreta (Service Role Key)**. Necessária para operações de administrador (como criar novos usuários). **Mantenha esta chave em segredo.** |
+| `VITE_SUPABASE_URL` | `SEU_SUPABASE_URL` | URL da API do seu projeto Supabase. |
+| `VITE_SUPABASE_ANON_KEY` | `SEU_SUPABASE_ANON_KEY` | Chave pública (Anon Key) do seu projeto Supabase. |
+| `SUPABASE_SERVICE_ROLE_KEY` | `SEU_SUPABASE_SERVICE_ROLE_KEY` | **Chave Secreta (Service Role Key)**. Necessária para operações de administrador (como criar novos usuários). **Mantenha esta chave em segredo.** |
 
 **Passos Adicionais no Supabase:**
 
