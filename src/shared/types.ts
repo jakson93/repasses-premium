@@ -22,11 +22,12 @@ export const MotorcycleSchema = z.object({
   is_worth_financing: z.number().int(),
   thumbnail_url: z.string().nullable(),
   created_at: z.string(),
+  status: z.string().nullable(), // Adicionado status
   updated_at: z.string(),
 });
 
 export type Motorcycle = z.infer<typeof MotorcycleSchema> & {
-  images: { id: number; url: string; filename: string }[];
+  images: { id: number; url: string; filename: string; name: string }[]; // Adicionado name
 };
 
 export const MotorcycleImageSchema = z.object({
