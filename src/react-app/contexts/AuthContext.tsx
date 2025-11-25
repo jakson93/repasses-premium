@@ -1,7 +1,7 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
 interface User {
-  id: number;
+  id: string;
   email: string;
   name?: string;
 }
@@ -13,26 +13,59 @@ interface AuthContextType {
   register: (email: string, password: string, name?: string) => Promise<void>;
   logout: () => Promise<void>;
   fetchUser: () => Promise<void>;
+  getAccessToken: () => string | null;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+const ACCESS_TOKEN_KEY = 'sb-access-token';
+const REFRESH_TOKEN_KEY = 'sb-refresh-token';
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isPending, setIsPending] = useState(true);
 
+  const getAccessToken = () => {
+    return localStorage.getItem(ACCESS_TOKEN_KEY);
+  };
+
+  const setTokens = (accessToken: string, refreshToken: string) => {
+    localStorage.setItem(ACCESS_TOKEN_KEY, accessToken);
+    localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
+  };
+
+  const clearTokens = () => {
+    localStorage.removeItem(ACCESS_TOKEN_KEY);
+    localStorage.removeItem(REFRESH_TOKEN_KEY);
+  };
+
   const fetchUser = async () => {
     try {
-      const response = await fetch('/api/users/me');
+      const token = getAccessToken();
+      
+      if (!token) {
+        setUser(null);
+        setIsPending(false);
+        return;
+      }
+
+      const response = await fetch('/api/users/me', {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
       if (response.ok) {
         const userData = await response.json();
         setUser(userData);
       } else {
         setUser(null);
+        clearTokens();
       }
     } catch (error) {
       console.error('Failed to fetch user:', error);
       setUser(null);
+      clearTokens();
     } finally {
       setIsPending(false);
     }
@@ -55,6 +88,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
 
     const data = await response.json();
+    
+    // Armazenar tokens
+    if (data.session) {
+      setTokens(data.session.access_token, data.session.refresh_token);
+    }
+    
     setUser(data.user);
   };
 
@@ -71,16 +110,37 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
 
     const data = await response.json();
+    
+    // Armazenar tokens
+    if (data.session) {
+      setTokens(data.session.access_token, data.session.refresh_token);
+    }
+    
     setUser(data.user);
   };
 
   const logout = async () => {
-    await fetch('/api/auth/logout', { method: 'POST' });
+    const token = getAccessToken();
+    
+    if (token) {
+      try {
+        await fetch('/api/auth/logout', { 
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+        });
+      } catch (error) {
+        console.error('Logout error:', error);
+      }
+    }
+    
+    clearTokens();
     setUser(null);
   };
 
   return (
-    <AuthContext.Provider value={{ user, isPending, login, register, logout, fetchUser }}>
+    <AuthContext.Provider value={{ user, isPending, login, register, logout, fetchUser, getAccessToken }}>
       {children}
     </AuthContext.Provider>
   );
