@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { apiPost, apiDelete, apiGet } from '@/react-app/utils/api';
 
 interface User {
   id: string;
@@ -49,16 +50,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return;
       }
 
-      const response = await fetch('/api/users/me', {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-
-      if (response.ok) {
-        const userData = await response.json();
-        setUser(userData);
-      } else {
+try {
+	        const userData = await apiGet<User>('/api/users/me');
+	        setUser(userData);
+	      } catch (e) {
         setUser(null);
         clearTokens();
       }
@@ -76,18 +71,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const login = async (email: string, password: string) => {
-    const response = await fetch('/api/auth/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password }),
-    });
-
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.error || 'Falha no login');
-    }
-
-    const data = await response.json();
+const data = await apiPost<{ user: User, session: { access_token: string, refresh_token: string } }>('/api/auth/login', { email, password });
     
     // Armazenar tokens
     if (data.session) {
@@ -98,18 +82,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const register = async (email: string, password: string, name?: string) => {
-    const response = await fetch('/api/auth/register', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password, name }),
-    });
-
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.error || 'Falha no registro');
-    }
-
-    const data = await response.json();
+const data = await apiPost<{ user: User, session: { access_token: string, refresh_token: string } }>('/api/auth/register', { email, password, name });
     
     // Armazenar tokens
     if (data.session) {
@@ -124,12 +97,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     
     if (token) {
       try {
-        await fetch('/api/auth/logout', { 
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-          },
-        });
+await apiPost('/api/auth/logout');
       } catch (error) {
         console.error('Logout error:', error);
       }

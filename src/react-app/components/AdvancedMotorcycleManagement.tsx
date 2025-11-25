@@ -16,6 +16,7 @@ import {
   Car,
 } from "lucide-react";
 import type { Motorcycle } from "@/shared/types";
+import { apiGet, apiPost, apiPut, apiDelete, apiUpload } from "@/react-app/utils/api";
 
 export default function AdvancedMotorcycleManagement() {
   const [motorcycles, setMotorcycles] = useState<Motorcycle[]>([]);
@@ -55,8 +56,7 @@ export default function AdvancedMotorcycleManagement() {
 
   const loadMotorcycles = async () => {
     try {
-      const response = await fetch(`/api/motorcycles?sortBy=${sortBy}`);
-      const data = await response.json();
+      const data = await apiGet<Motorcycle[]>(`/api/motorcycles?sortBy=${sortBy}`);
       setMotorcycles(data);
     } catch (error) {
       console.error("Failed to load motorcycles:", error);
@@ -72,18 +72,11 @@ export default function AdvancedMotorcycleManagement() {
       const url = editingId
         ? `/api/motorcycles/${editingId}`
         : "/api/motorcycles";
-      const method = editingId ? "PUT" : "POST";
 
-      const response = await fetch(url, {
-        method,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
+      await (editingId ? apiPut(url, formData) : apiPost(url, formData));
 
-      if (response.ok) {
-        await loadMotorcycles();
-        resetForm();
-      }
+      await loadMotorcycles();
+      resetForm();
     } catch (error) {
       console.error("Failed to save motorcycle:", error);
     }
@@ -119,13 +112,8 @@ export default function AdvancedMotorcycleManagement() {
     if (!confirm("Tem certeza que deseja excluir esta moto?")) return;
 
     try {
-      const response = await fetch(`/api/motorcycles/${id}`, {
-        method: "DELETE",
-      });
-
-      if (response.ok) {
-        await loadMotorcycles();
-      }
+      await apiDelete(`/api/motorcycles/${id}`);
+      await loadMotorcycles();
     } catch (error) {
       console.error("Failed to delete motorcycle:", error);
     }
@@ -139,15 +127,8 @@ export default function AdvancedMotorcycleManagement() {
         updateData.sold_at = new Date().toISOString();
       }
 
-      const response = await fetch(`/api/motorcycles/${id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(updateData),
-      });
-
-      if (response.ok) {
-        await loadMotorcycles();
-      }
+      await apiPut(`/api/motorcycles/${id}`, updateData);
+      await loadMotorcycles();
     } catch (error) {
       console.error("Failed to update status:", error);
     }
@@ -155,17 +136,10 @@ export default function AdvancedMotorcycleManagement() {
 
   const toggleFeatured = async (motorcycle: Motorcycle) => {
     try {
-      const response = await fetch(`/api/motorcycles/${motorcycle.id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          is_featured: motorcycle.is_featured === 1 ? false : true,
-        }),
+      await apiPut(`/api/motorcycles/${motorcycle.id}`, {
+        is_featured: motorcycle.is_featured === 1 ? false : true,
       });
-
-      if (response.ok) {
-        await loadMotorcycles();
-      }
+      await loadMotorcycles();
     } catch (error) {
       console.error("Failed to toggle featured:", error);
     }
@@ -181,13 +155,7 @@ export default function AdvancedMotorcycleManagement() {
 
     try {
       for (const file of Array.from(files)) {
-        const formData = new FormData();
-        formData.append("image", file);
-
-        await fetch(`/api/motorcycles/${motorcycleId}/images`, {
-          method: "POST",
-          body: formData,
-        });
+        await apiUpload(`/api/motorcycles/${motorcycleId}/images`, file, "image");
       }
 
       await loadMotorcycles();
@@ -320,184 +288,161 @@ export default function AdvancedMotorcycleManagement() {
           className="px-4 py-3 rounded-xl bg-black border border-yellow-500/30 text-white focus:outline-none focus:border-yellow-500 transition-colors duration-200"
         >
           <option value="newest">Mais Recente</option>
-          <option value="price_asc">Menor Preço</option>
-          <option value="price_desc">Maior Preço</option>
-          <option value="year_desc">Ano Mais Novo</option>
-          <option value="year_asc">Ano Mais Antigo</option>
+          <option value="oldest">Mais Antigo</option>
+          <option value="price-asc">Preço (Menor)</option>
+          <option value="price-desc">Preço (Maior)</option>
         </select>
       </div>
 
       {/* Form */}
       {showForm && (
         <div className="premium-card p-8 rounded-xl">
-          <h3 className="text-2xl font-bold text-white mb-6">
+          <h3 className="text-xl font-bold text-white mb-6">
             {editingId ? "Editar Moto" : "Cadastrar Nova Moto"}
           </h3>
           <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Marca *
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={formData.brand}
-                  onChange={(e) => setFormData({ ...formData, brand: e.target.value })}
-                  className="w-full px-4 py-3 rounded-lg bg-black border border-yellow-500/30 text-white placeholder-gray-500 focus:outline-none focus:border-yellow-500 transition-colors duration-200"
-                  placeholder="Ex: Honda"
-                />
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {/* Basic Info */}
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Marca *</label>
+                  <input
+                    type="text"
+                    value={formData.brand}
+                    onChange={(e) => setFormData({ ...formData, brand: e.target.value })}
+                    className="w-full px-4 py-3 rounded-lg bg-black border border-yellow-500/30 text-white placeholder-gray-500 focus:outline-none focus:border-yellow-500 transition-colors duration-200"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Modelo *</label>
+                  <input
+                    type="text"
+                    value={formData.model}
+                    onChange={(e) => setFormData({ ...formData, model: e.target.value })}
+                    className="w-full px-4 py-3 rounded-lg bg-black border border-yellow-500/30 text-white placeholder-gray-500 focus:outline-none focus:border-yellow-500 transition-colors duration-200"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Ano *</label>
+                  <input
+                    type="number"
+                    value={formData.year}
+                    onChange={(e) => setFormData({ ...formData, year: parseInt(e.target.value) })}
+                    className="w-full px-4 py-3 rounded-lg bg-black border border-yellow-500/30 text-white placeholder-gray-500 focus:outline-none focus:border-yellow-500 transition-colors duration-200"
+                    required
+                  />
+                </div>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Modelo *
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={formData.model}
-                  onChange={(e) => setFormData({ ...formData, model: e.target.value })}
-                  className="w-full px-4 py-3 rounded-lg bg-black border border-yellow-500/30 text-white placeholder-gray-500 focus:outline-none focus:border-yellow-500 transition-colors duration-200"
-                  placeholder="Ex: CG 160"
-                />
+              {/* Details */}
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Preço (R$) *</label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    value={formData.price}
+                    onChange={(e) => setFormData({ ...formData, price: parseFloat(e.target.value) })}
+                    className="w-full px-4 py-3 rounded-lg bg-black border border-yellow-500/30 text-white placeholder-gray-500 focus:outline-none focus:border-yellow-500 transition-colors duration-200"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Cor</label>
+                  <input
+                    type="text"
+                    value={formData.color}
+                    onChange={(e) => setFormData({ ...formData, color: e.target.value })}
+                    className="w-full px-4 py-3 rounded-lg bg-black border border-yellow-500/30 text-white placeholder-gray-500 focus:outline-none focus:border-yellow-500 transition-colors duration-200"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Quilometragem (km)</label>
+                  <input
+                    type="number"
+                    value={formData.mileage}
+                    onChange={(e) => setFormData({ ...formData, mileage: parseInt(e.target.value) })}
+                    className="w-full px-4 py-3 rounded-lg bg-black border border-yellow-500/30 text-white placeholder-gray-500 focus:outline-none focus:border-yellow-500 transition-colors duration-200"
+                  />
+                </div>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Ano *
-                </label>
-                <input
-                  type="number"
-                  required
-                  value={formData.year}
-                  onChange={(e) => setFormData({ ...formData, year: parseInt(e.target.value) })}
-                  className="w-full px-4 py-3 rounded-lg bg-black border border-yellow-500/30 text-white placeholder-gray-500 focus:outline-none focus:border-yellow-500 transition-colors duration-200"
-                />
-              </div>
+              {/* Status & Condition */}
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Status *</label>
+                  <select
+                    value={formData.status}
+                    onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+                    className="w-full px-4 py-3 rounded-lg bg-black border border-yellow-500/30 text-white focus:outline-none focus:border-yellow-500 transition-colors duration-200"
+                    required
+                  >
+                    <option value="disponivel">Disponível</option>
+                    <option value="reservada">Reservada</option>
+                    <option value="vendida">Vendida</option>
+                    <option value="aguardando_pagamento">Aguardando Pagamento</option>
+                  </select>
+                </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Preço (R$) *
-                </label>
-                <input
-                  type="number"
-                  required
-                  step="0.01"
-                  value={formData.price}
-                  onChange={(e) => setFormData({ ...formData, price: parseFloat(e.target.value) })}
-                  className="w-full px-4 py-3 rounded-lg bg-black border border-yellow-500/30 text-white placeholder-gray-500 focus:outline-none focus:border-yellow-500 transition-colors duration-200"
-                />
-              </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Condição</label>
+                  <select
+                    value={formData.condition}
+                    onChange={(e) => setFormData({ ...formData, condition: e.target.value })}
+                    className="w-full px-4 py-3 rounded-lg bg-black border border-yellow-500/30 text-white focus:outline-none focus:border-yellow-500 transition-colors duration-200"
+                  >
+                    <option value="usado">Usado</option>
+                    <option value="novo">Novo</option>
+                    <option value="seminovo">Seminovo</option>
+                  </select>
+                </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Cor
-                </label>
-                <input
-                  type="text"
-                  value={formData.color}
-                  onChange={(e) => setFormData({ ...formData, color: e.target.value })}
-                  className="w-full px-4 py-3 rounded-lg bg-black border border-yellow-500/30 text-white placeholder-gray-500 focus:outline-none focus:border-yellow-500 transition-colors duration-200"
-                  placeholder="Ex: Preta"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Quilometragem (km)
-                </label>
-                <input
-                  type="number"
-                  value={formData.mileage}
-                  onChange={(e) => setFormData({ ...formData, mileage: parseInt(e.target.value) })}
-                  className="w-full px-4 py-3 rounded-lg bg-black border border-yellow-500/30 text-white placeholder-gray-500 focus:outline-none focus:border-yellow-500 transition-colors duration-200"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Status *
-                </label>
-                <select
-                  value={formData.status}
-                  onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                  className="w-full px-4 py-3 rounded-lg bg-black border border-yellow-500/30 text-white focus:outline-none focus:border-yellow-500 transition-colors duration-200"
-                >
-                  <option value="disponivel">Disponível</option>
-                  <option value="reservada">Reservada</option>
-                  <option value="vendida">Vendida</option>
-                  <option value="aguardando_pagamento">Aguardando Pagamento</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Condição
-                </label>
-                <select
-                  value={formData.condition}
-                  onChange={(e) => setFormData({ ...formData, condition: e.target.value })}
-                  className="w-full px-4 py-3 rounded-lg bg-black border border-yellow-500/30 text-white focus:outline-none focus:border-yellow-500 transition-colors duration-200"
-                >
-                  <option value="novo">Novo</option>
-                  <option value="seminovo">Seminovo</option>
-                  <option value="usado">Usado</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Forma de Pagamento
-                </label>
-                <select
-                  value={formData.payment_methods}
-                  onChange={(e) => setFormData({ ...formData, payment_methods: e.target.value })}
-                  className="w-full px-4 py-3 rounded-lg bg-black border border-yellow-500/30 text-white focus:outline-none focus:border-yellow-500 transition-colors duration-200"
-                >
-                  <option value="à vista">À Vista</option>
-                  <option value="financiado">Financiado</option>
-                  <option value="ambos">À Vista ou Financiado</option>
-                </select>
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Forma de Pagamento</label>
+                  <select
+                    value={formData.payment_methods}
+                    onChange={(e) => setFormData({ ...formData, payment_methods: e.target.value })}
+                    className="w-full px-4 py-3 rounded-lg bg-black border border-yellow-500/30 text-white focus:outline-none focus:border-yellow-500 transition-colors duration-200"
+                  >
+                    <option value="à vista">À Vista</option>
+                    <option value="financiado">Financiado</option>
+                    <option value="cartão de crédito">Cartão de Crédito</option>
+                  </select>
+                </div>
               </div>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
-                Descrição
-              </label>
+              <label className="block text-sm font-medium text-gray-300 mb-2">Descrição</label>
               <textarea
-                rows={4}
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                rows={4}
                 className="w-full px-4 py-3 rounded-lg bg-black border border-yellow-500/30 text-white placeholder-gray-500 focus:outline-none focus:border-yellow-500 transition-colors duration-200"
-                placeholder="Descreva os detalhes da moto..."
-              />
+              ></textarea>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-3">
-                <label className="flex items-center space-x-3 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={formData.is_featured}
-                    onChange={(e) => setFormData({ ...formData, is_featured: e.target.checked })}
-                    className="w-5 h-5 rounded bg-black border-yellow-500/30 text-yellow-500 focus:ring-yellow-500"
-                  />
-                  <span className="text-gray-300">Moto em destaque</span>
-                </label>
-
-                <label className="flex items-center space-x-3 cursor-pointer">
+            {/* Finance Info */}
+            <div className="space-y-4 p-4 border border-gray-700 rounded-lg">
+              <h4 className="text-lg font-semibold text-white">Informações de Financiamento</h4>
+              <div className="flex items-center space-x-4">
+                <label className="flex items-center space-x-2 cursor-pointer">
                   <input
                     type="checkbox"
                     checked={formData.is_financed}
                     onChange={(e) => setFormData({ ...formData, is_financed: e.target.checked })}
                     className="w-5 h-5 rounded bg-black border-yellow-500/30 text-yellow-500 focus:ring-yellow-500"
                   />
-                  <span className="text-gray-300">Está financiada</span>
+                  <span className="text-gray-300">É financiada?</span>
                 </label>
 
-                <label className="flex items-center space-x-3 cursor-pointer">
+                <label className="flex items-center space-x-2 cursor-pointer">
                   <input
                     type="checkbox"
                     checked={formData.is_overdue}

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { apiGet } from "@/react-app/utils/api";
 import {
   TrendingUp,
   TrendingDown,
@@ -60,12 +61,9 @@ export default function Dashboard() {
 
   const loadDashboardData = async () => {
     try {
-      const response = await fetch("/api/dashboard/stats");
-      if (response.ok) {
-        const data = await response.json();
-        setStats(data.stats);
-        setMonthlyData(data.monthlyData);
-      }
+      const data = await apiGet<{ stats: DashboardStats, monthlyData: MonthlyData[] }>("/api/dashboard/stats");
+      setStats(data.stats);
+      setMonthlyData(data.monthlyData);
     } catch (error) {
       console.error("Failed to load dashboard data:", error);
     } finally {

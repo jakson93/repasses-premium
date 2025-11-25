@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { apiGet, apiPost, apiPut, apiDelete } from "@/react-app/utils/api";
 import {
   Plus,
   TrendingUp,
@@ -83,20 +84,13 @@ export default function FinancialManagement() {
 
   const loadFinancialData = async () => {
     try {
-      const [recordsResponse, summaryResponse] = await Promise.all([
-        fetch("/api/financial/records"),
-        fetch("/api/financial/summary"),
-      ]);
+const [recordsData, summaryData] = await Promise.all([
+	        apiGet<FinancialRecord[]>("/api/financial/records"),
+	        apiGet<FinancialSummary>("/api/financial/summary"),
+	      ]);
 
-      if (recordsResponse.ok) {
-        const recordsData = await recordsResponse.json();
-        setRecords(recordsData);
-      }
-
-      if (summaryResponse.ok) {
-        const summaryData = await summaryResponse.json();
-        setSummary(summaryData);
-      }
+	      setRecords(recordsData);
+	      setSummary(summaryData);
     } catch (error) {
       console.error("Failed to load financial data:", error);
       // Mock data for demonstration
@@ -186,13 +180,9 @@ export default function FinancialManagement() {
         : "/api/financial/records";
       const method = editingId ? "PUT" : "POST";
 
-      const response = await fetch(url, {
-        method,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
+await (editingId ? apiPut(url, formData) : apiPost(url, formData));
 
-      if (response.ok) {
+	      if (true) {
         await loadFinancialData();
         resetForm();
       }
@@ -234,11 +224,9 @@ export default function FinancialManagement() {
     if (!confirm("Tem certeza que deseja excluir esta transação?")) return;
 
     try {
-      const response = await fetch(`/api/financial/records/${id}`, {
-        method: "DELETE",
-      });
+await apiDelete(`/api/financial/records/${id}`);
 
-      if (response.ok) {
+	      if (true) {
         await loadFinancialData();
       }
     } catch (error) {

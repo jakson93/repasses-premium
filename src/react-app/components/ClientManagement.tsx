@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { apiGet, apiPost, apiPut, apiDelete } from "@/react-app/utils/api";
 import {
   Plus,
   Search,
@@ -52,11 +53,8 @@ export default function ClientManagement() {
 
   const loadClients = async () => {
     try {
-      const response = await fetch("/api/clients");
-      if (response.ok) {
-        const data = await response.json();
+      const data = await apiGet<Client[]>("/api/clients");
         setClients(data);
-      }
     } catch (error) {
       console.error("Failed to load clients:", error);
     } finally {
@@ -71,13 +69,9 @@ export default function ClientManagement() {
       const url = editingId ? `/api/clients/${editingId}` : "/api/clients";
       const method = editingId ? "PUT" : "POST";
 
-      const response = await fetch(url, {
-        method,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
+await (editingId ? apiPut(url, formData) : apiPost(url, formData));
 
-      if (response.ok) {
+	      if (true) {
         await loadClients();
         resetForm();
       }
@@ -104,11 +98,9 @@ export default function ClientManagement() {
     if (!confirm("Tem certeza que deseja excluir este cliente?")) return;
 
     try {
-      const response = await fetch(`/api/clients/${id}`, {
-        method: "DELETE",
-      });
+await apiDelete(`/api/clients/${id}`);
 
-      if (response.ok) {
+	      if (true) {
         await loadClients();
       }
     } catch (error) {
