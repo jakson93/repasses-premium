@@ -580,14 +580,14 @@ export default function AdvancedMotorcycleManagement() {
                       <h4 className="text-sm font-semibold text-gray-300 mb-2">Imagens ({motorcycle.images.length})</h4>
                       <div className="flex flex-wrap gap-2">
                         {motorcycle.images.map((image) => (
-                          <div key={image.id} className="relative group">
+                          <div key={image.name} className="relative group">
                             <img
                               src={image.url}
-                              alt={image.filename}
+                              alt={image.name}
                               className="w-20 h-20 object-cover rounded-lg border border-gray-700"
                             />
                             <button
-                              onClick={() => handleDeleteImage(motorcycle.id, image.filename)}
+                              onClick={() => handleDeleteImage(motorcycle.id, image.name)}
                               className="absolute top-0 right-0 p-1 bg-red-600 rounded-full text-white opacity-0 group-hover:opacity-100 transition-opacity duration-200"
                               title="Excluir imagem"
                             >

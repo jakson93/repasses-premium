@@ -42,9 +42,24 @@ export default function MotorcycleCard({ motorcycle }: MotorcycleCardProps) {
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
         
         {motorcycle.is_featured === 1 && (
-          <div className="absolute top-3 right-3 px-3 py-1 rounded-full bg-yellow-500 text-black text-xs font-bold shadow-lg speed-glow flex items-center space-x-1">
+          <div className="absolute top-3 right-3 px-3 py-1 rounded-full bg-yellow-500 text-black text-xs font-bold shadow-lg speed-glow flex items-center space-x-1 z-20">
             <Star className="w-3 h-3" />
             <span>DESTAQUE</span>
+          </div>
+        )}
+        
+        {/* Status Overlay */}
+        {motorcycle.status === 'vendida' && (
+          <div className="absolute inset-0 flex items-center justify-center bg-red-600/70 backdrop-blur-sm z-10">
+            <span className="text-5xl font-black text-white tracking-widest transform rotate-[-15deg] opacity-90">
+              VENDIDA
+            </span>
+          </div>
+        )}
+        
+        {motorcycle.status !== 'vendida' && motorcycle.status && (
+          <div className="absolute top-3 left-3 px-3 py-1 rounded-full bg-blue-600/80 text-white text-xs font-bold shadow-lg z-20">
+            {motorcycle.status.toUpperCase()}
           </div>
         )}
         
