@@ -63,12 +63,7 @@ export default function MotorcycleCard({ motorcycle }: MotorcycleCardProps) {
           </div>
         )}
         
-        {motorcycle.is_financed === 1 && (
-          <div className="absolute top-3 left-3 px-3 py-1 rounded-full bg-blue-500 text-white text-xs font-bold shadow-lg flex items-center space-x-1">
-            <Clock className="w-3 h-3" />
-            <span>FINANCIADO</span>
-          </div>
-        )}
+
 
         {/* Speed effect overlay */}
         <div className="absolute bottom-0 left-0 right-0 h-1 speed-lines opacity-30"></div>
