@@ -29,9 +29,6 @@ importers:
       lucide-react:
         specifier: ^0.510.0
         version: 0.510.0(react@19.0.0)
-      netlify:
-        specifier: link:@hono/node-server/netlify
-        version: link:@hono/node-server/netlify
       react:
         specifier: 19.0.0
         version: 19.0.0
