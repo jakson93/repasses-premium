@@ -411,7 +411,7 @@ app.delete("/api/images/:id", authMiddleware, async (c) => {
 
   return c.json({ success: true });
 });
-// Exportar o handler para o Netlify Functions\nexport const handler = handle(app);
+
 
 // Exportar o handler para o Netlify Edge Functions
 export default app;

@@ -5,16 +5,13 @@ build({
   alias: {
     '@': './src',
   },
-  footer: {
-    // Apenas exportar o handler do Hono
-    js: "module.exports.handler = app.fetch.bind(app);",
-  },
+
   bundle: true,
   // Compilar para o diretório correto de Edge Functions
   outfile: 'netlify/edge-functions/index.js',
-  platform: 'node',
+  platform: 'browser',
   target: 'node18',
-  format: 'cjs',
+  format: 'esm',
   external: [],
   define: {
     // Injetar variáveis de ambiente para o worker
