@@ -62,6 +62,12 @@ export default function Dashboard() {
   const loadDashboardData = async () => {
     try {
       const data = await apiGet<{ stats: DashboardStats, monthlyData: MonthlyData[] }>("/api/dashboard/stats");
+      if (!data.stats) {
+        // Se a API retornar dados parciais ou nulos, inicializa com valores padrão
+        setStats(stats);
+        setMonthlyData([]);
+        return;
+      }
       setStats(data.stats);
       setMonthlyData(data.monthlyData);
     } catch (error) {

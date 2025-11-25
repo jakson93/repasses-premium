@@ -57,7 +57,12 @@ export default function AdvancedMotorcycleManagement() {
   const loadMotorcycles = async () => {
     try {
       const data = await apiGet<Motorcycle[]>(`/api/motorcycles?sortBy=${sortBy}`);
-      setMotorcycles(data);
+      // Garantir que o campo images exista, mesmo que vazio
+      const motorcyclesWithImages = data.map(m => ({
+        ...m,
+        images: m.images || [],
+      }));
+      setMotorcycles(motorcyclesWithImages);
     } catch (error) {
       console.error("Failed to load motorcycles:", error);
     } finally {
@@ -163,6 +168,17 @@ export default function AdvancedMotorcycleManagement() {
       console.error("Failed to upload images:", error);
     } finally {
       setUploadingImages(null);
+    }
+  };
+
+  const handleDeleteImage = async (motorcycleId: number, imageId: number) => {
+    if (!confirm("Tem certeza que deseja excluir esta imagem?")) return;
+
+    try {
+      await apiDelete(`/api/motorcycles/${motorcycleId}/images/${imageId}`);
+      await loadMotorcycles();
+    } catch (error) {
+      console.error("Failed to delete image:", error);
     }
   };
 
@@ -542,6 +558,12 @@ export default function AdvancedMotorcycleManagement() {
                       {getStatusIcon((motorcycle as any).status || 'disponivel')}
                       <span>{((motorcycle as any).status || 'disponivel').replace('_', ' ').toUpperCase()}</span>
                     </div>
+                    {/* Tarja de Vendida */}
+                    {(motorcycle as any).status === 'vendida' && (
+                      <span className="px-3 py-1 rounded-full bg-red-500 text-white text-xs font-bold">
+                        VENDIDA
+                      </span>
+                    )}
                   </div>
 
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm text-gray-400 mb-4">
@@ -552,6 +574,28 @@ export default function AdvancedMotorcycleManagement() {
                     {motorcycle.mileage && (
                       <span>{motorcycle.mileage.toLocaleString("pt-BR")} km</span>
                     )}
+                    {/* Imagens */}
+                    <div className="md:col-span-4 mt-4">
+                      <h4 className="text-sm font-semibold text-gray-300 mb-2">Imagens ({motorcycle.images.length})</h4>
+                      <div className="flex flex-wrap gap-2">
+                        {motorcycle.images.map((image) => (
+                          <div key={image.id} className="relative group">
+                            <img
+                              src={image.url}
+                              alt={image.filename}
+                              className="w-20 h-20 object-cover rounded-lg border border-gray-700"
+                            />
+                            <button
+                              onClick={() => handleDeleteImage(motorcycle.id, image.id)}
+                              className="absolute top-0 right-0 p-1 bg-red-600 rounded-full text-white opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+                              title="Excluir imagem"
+                            >
+                              <X className="w-3 h-3" />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
                     <span>Condição: {motorcycle.condition || "N/A"}</span>
                   </div>
 

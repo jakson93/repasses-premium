@@ -25,7 +25,9 @@ export const MotorcycleSchema = z.object({
   updated_at: z.string(),
 });
 
-export type Motorcycle = z.infer<typeof MotorcycleSchema>;
+export type Motorcycle = z.infer<typeof MotorcycleSchema> & {
+  images: { id: number; url: string; filename: string }[];
+};
 
 export const MotorcycleImageSchema = z.object({
   id: z.number(),
@@ -83,6 +85,4 @@ export const MotorcycleFiltersSchema = z.object({
 
 export type MotorcycleFilters = z.infer<typeof MotorcycleFiltersSchema>;
 
-export interface MotorcycleWithImages extends Motorcycle {
-  images: MotorcycleImage[];
-}
+

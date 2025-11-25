@@ -7,8 +7,8 @@ import {
   CreateMotorcycleSchema,
   UpdateMotorcycleSchema,
   MotorcycleFiltersSchema,
-  type Motorcycle,
-  type MotorcycleWithImages,
+
+
 } from "@/shared/types";
 import { 
   authMiddleware, 
@@ -548,8 +548,8 @@ app.get("/api/motorcycles/:id", async (c) => {
       }));
     }
 
-    const motorcycleWithImages: MotorcycleWithImages = {
-      ...motorcycle as Motorcycle,
+    const motorcycleWithImages = {
+      ...motorcycle,
       images: images,
     };
 

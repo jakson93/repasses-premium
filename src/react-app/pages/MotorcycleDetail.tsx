@@ -14,11 +14,11 @@ import {
 import Header from "@/react-app/components/Header";
 import Footer from "@/react-app/components/Footer";
 import ImageCarousel from "@/react-app/components/ImageCarousel";
-import type { MotorcycleWithImages } from "@/shared/types";
+import type { Motorcycle } from "@/shared/types";
 
 export default function MotorcycleDetail() {
   const { id } = useParams();
-  const [motorcycle, setMotorcycle] = useState<MotorcycleWithImages | null>(null);
+  const [motorcycle, setMotorcycle] = useState<Motorcycle | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -264,7 +264,7 @@ export default function MotorcycleDetail() {
                 Opcionais e Recursos
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {motorcycle.features.split(",").map((feature, index) => (
+                {motorcycle.features.split(",").map((feature: string, index: number) => (
                   <div
                     key={index}
                     className="flex items-center space-x-2 text-slate-300"

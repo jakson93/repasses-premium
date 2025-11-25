@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import type { MotorcycleImage } from "@/shared/types";
+import type { Motorcycle } from "@/shared/types";
 
 interface ImageCarouselProps {
-  images: MotorcycleImage[];
+  images: Motorcycle['images'];
   alt: string;
 }
 
@@ -34,7 +34,7 @@ export default function ImageCarousel({ images, alt }: ImageCarouselProps) {
     <div className="relative">
       <div className="relative aspect-video bg-slate-900 rounded-xl overflow-hidden group">
         <img
-          src={images[currentIndex].image_url}
+          src={images[currentIndex].url}
           alt={`${alt} - Imagem ${currentIndex + 1}`}
           className="w-full h-full object-cover"
         />
@@ -85,7 +85,7 @@ export default function ImageCarousel({ images, alt }: ImageCarouselProps) {
               }`}
             >
               <img
-                src={image.image_url}
+                src={image.url}
                 alt={`${alt} - Miniatura ${index + 1}`}
                 className="w-full h-full object-cover"
               />
