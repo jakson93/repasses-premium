@@ -133,7 +133,8 @@ export default function AdvancedMotorcycleManagement() {
       }
 
       await apiPut(`/api/motorcycles/${id}`, updateData);
-      await loadMotorcycles();
+      // Atualiza o estado localmente para refletir a mudança imediatamente
+      setMotorcycles(prev => prev.map(m => m.id === id ? { ...m, status: newStatus } : m));
     } catch (error) {
       console.error("Failed to update status:", error);
     }
@@ -171,11 +172,11 @@ export default function AdvancedMotorcycleManagement() {
     }
   };
 
-  const handleDeleteImage = async (motorcycleId: number, imageId: number) => {
+  const handleDeleteImage = async (motorcycleId: number, imageName: string) => {
     if (!confirm("Tem certeza que deseja excluir esta imagem?")) return;
 
     try {
-      await apiDelete(`/api/motorcycles/${motorcycleId}/images/${imageId}`);
+      await apiDelete(`/api/motorcycles/${motorcycleId}/images/${imageName}`);
       await loadMotorcycles();
     } catch (error) {
       console.error("Failed to delete image:", error);
@@ -586,7 +587,7 @@ export default function AdvancedMotorcycleManagement() {
                               className="w-20 h-20 object-cover rounded-lg border border-gray-700"
                             />
                             <button
-                              onClick={() => handleDeleteImage(motorcycle.id, image.id)}
+                              onClick={() => handleDeleteImage(motorcycle.id, image.filename)}
                               className="absolute top-0 right-0 p-1 bg-red-600 rounded-full text-white opacity-0 group-hover:opacity-100 transition-opacity duration-200"
                               title="Excluir imagem"
                             >

@@ -18354,7 +18354,23 @@ app.get("/api/motorcycles", async (c) => {
       console.error("Supabase Query Error:", error);
       return c.json({ error: "Erro ao buscar motos" }, 500);
     }
-    return c.json(results || []);
+    const motorcyclesWithThumbnails = await Promise.all(
+      (results || []).map(async (motorcycle) => {
+        if (motorcycle.thumbnail_url) {
+          return motorcycle;
+        }
+        const { data: imageList, error: storageError } = await supabase.storage.from("motorcycle_images").list(`motorcycles/${motorcycle.id}`, {
+          limit: 1,
+          sortBy: { column: "name", order: "asc" }
+        });
+        if (!storageError && imageList && imageList.length > 0) {
+          const publicUrl = supabase.storage.from("motorcycle_images").getPublicUrl(`motorcycles/${motorcycle.id}/${imageList[0].name}`).data.publicUrl;
+          return { ...motorcycle, thumbnail_url: publicUrl };
+        }
+        return motorcycle;
+      })
+    );
+    return c.json(motorcyclesWithThumbnails || []);
   } catch (error) {
     console.error("Get motorcycles error:", error);
     return c.json({ error: "Erro interno no servidor" }, 500);
@@ -18368,7 +18384,23 @@ app.get("/api/motorcycles/featured", async (c) => {
       console.error("Supabase Query Error:", error);
       return c.json({ error: "Erro ao buscar motos em destaque" }, 500);
     }
-    return c.json(results || []);
+    const motorcyclesWithThumbnails = await Promise.all(
+      (results || []).map(async (motorcycle) => {
+        if (motorcycle.thumbnail_url) {
+          return motorcycle;
+        }
+        const { data: imageList, error: storageError } = await supabase.storage.from("motorcycle_images").list(`motorcycles/${motorcycle.id}`, {
+          limit: 1,
+          sortBy: { column: "name", order: "asc" }
+        });
+        if (!storageError && imageList && imageList.length > 0) {
+          const publicUrl = supabase.storage.from("motorcycle_images").getPublicUrl(`motorcycles/${motorcycle.id}/${imageList[0].name}`).data.publicUrl;
+          return { ...motorcycle, thumbnail_url: publicUrl };
+        }
+        return motorcycle;
+      })
+    );
+    return c.json(motorcyclesWithThumbnails || []);
   } catch (error) {
     console.error("Get featured motorcycles error:", error);
     return c.json({ error: "Erro interno no servidor" }, 500);

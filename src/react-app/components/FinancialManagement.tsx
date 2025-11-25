@@ -93,78 +93,16 @@ const [recordsData, summaryData] = await Promise.all([
 	      setSummary(summaryData);
     } catch (error) {
       console.error("Failed to load financial data:", error);
-      // Mock data for demonstration
-      const mockRecords: FinancialRecord[] = [
-        {
-          id: 1,
-          type: 'entrada',
-          description: 'Venda Honda CG 160',
-          amount: 8500,
-          category: 'Venda',
-          date: '2024-11-04',
-          motorcycle_id: 1,
-          created_at: '2024-11-04T10:30:00Z',
-          updated_at: '2024-11-04T10:30:00Z',
-          motorcycle_info: { brand: 'Honda', model: 'CG 160' },
-        },
-        {
-          id: 2,
-          type: 'saida',
-          description: 'Compra Yamaha Fazer 250',
-          amount: 12000,
-          category: 'Aquisição',
-          date: '2024-11-03',
-          motorcycle_id: 2,
-          created_at: '2024-11-03T14:20:00Z',
-          updated_at: '2024-11-03T14:20:00Z',
-          motorcycle_info: { brand: 'Yamaha', model: 'Fazer 250' },
-        },
-        {
-          id: 3,
-          type: 'saida',
-          description: 'Manutenção e revisão',
-          amount: 350,
-          category: 'Manutenção',
-          date: '2024-11-02',
-          created_at: '2024-11-02T09:15:00Z',
-          updated_at: '2024-11-02T09:15:00Z',
-        },
-        {
-          id: 4,
-          type: 'entrada',
-          description: 'Venda Kawasaki Ninja 300',
-          amount: 15500,
-          category: 'Venda',
-          date: '2024-11-01',
-          motorcycle_id: 3,
-          created_at: '2024-11-01T16:45:00Z',
-          updated_at: '2024-11-01T16:45:00Z',
-          motorcycle_info: { brand: 'Kawasaki', model: 'Ninja 300' },
-        },
-      ];
-
-      setRecords(mockRecords);
-      
-      const totalEntradas = mockRecords
-        .filter(r => r.type === 'entrada')
-        .reduce((sum, r) => sum + r.amount, 0);
-      
-      const totalSaidas = mockRecords
-        .filter(r => r.type === 'saida')
-        .reduce((sum, r) => sum + r.amount, 0);
-
+      // Se houver erro, garante que o estado de carregamento seja falso e os dados sejam vazios
+      setRecords([]);
       setSummary({
-        totalEntradas,
-        totalSaidas,
-        saldo: totalEntradas - totalSaidas,
-        transacoesHoje: 2,
-        lucroMes: 12150,
-        gastosMes: 12350,
-        categorias: {
-          'Venda': 24000,
-          'Aquisição': 12000,
-          'Manutenção': 350,
-        },
+        totalEntradas: 0,
+        totalSaidas: 0,
+        saldo: 0,
+        transacoesHoje: 0,
+        lucroMes: 0,
+        gastosMes: 0,
+        categorias: {},
       });
     } finally {
       setLoading(false);
@@ -182,29 +120,15 @@ const [recordsData, summaryData] = await Promise.all([
 
 await (editingId ? apiPut(url, formData) : apiPost(url, formData));
 
-	      if (true) {
-        await loadFinancialData();
-        resetForm();
-      }
-    } catch (error) {
-      console.error("Failed to save financial record:", error);
-      // Mock success for demonstration
-      const newRecord: FinancialRecord = {
-        id: records.length + 1,
-        ...formData,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      };
-
-      if (editingId) {
-        setRecords(records.map(r => r.id === editingId ? { ...newRecord, id: editingId } : r));
-      } else {
-        setRecords([newRecord, ...records]);
-      }
-      
-      resetForm();
-    }
-  };
+		      if (true) {
+	        await loadFinancialData();
+	        resetForm();
+	      }
+	    } catch (error) {
+	      console.error("Failed to save financial record:", error);
+	      alert("Erro ao salvar registro financeiro. Verifique o console para detalhes.");
+	    }
+	  };
 
   const handleEdit = (record: FinancialRecord) => {
     setEditingId(record.id);
@@ -226,15 +150,14 @@ await (editingId ? apiPut(url, formData) : apiPost(url, formData));
     try {
 await apiDelete(`/api/financial/records/${id}`);
 
-	      if (true) {
-        await loadFinancialData();
-      }
-    } catch (error) {
-      console.error("Failed to delete financial record:", error);
-      // Mock success for demonstration
-      setRecords(records.filter(r => r.id !== id));
-    }
-  };
+		      if (true) {
+	        await loadFinancialData();
+	      }
+	    } catch (error) {
+	      console.error("Failed to delete financial record:", error);
+	      alert("Erro ao deletar registro financeiro. Verifique o console para detalhes.");
+	    }
+	  };
 
   const resetForm = () => {
     setShowForm(false);
