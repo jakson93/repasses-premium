@@ -112,6 +112,42 @@ app.post("/api/auth/logout", async (c) => {
   return c.json({ success: true });
 });
 
+// Dashboard and Financial endpoints
+app.get("/api/dashboard/stats", authMiddleware, async (c) => {
+  // Retornar dados mockados para evitar 404 e permitir que o frontend carregue
+  return c.json({
+    totalMotorcycles: 10,
+    availableMotorcycles: 5,
+    soldMotorcycles: 5,
+    totalRevenue: 50000.00,
+  });
+});
+
+app.get("/api/financial/summary", authMiddleware, async (c) => {
+  // Retornar dados mockados para evitar 404 e permitir que o frontend carregue
+  return c.json({
+    totalRevenue: 50000.00,
+    totalCost: 35000.00,
+    netProfit: 15000.00,
+    profitMargin: 0.30,
+  });
+});
+
+app.get("/api/financial/records", authMiddleware, async (c) => {
+  // Retornar dados mockados para evitar 404 e permitir que o frontend carregue
+  return c.json([
+    { id: 1, type: "sale", description: "Venda Honda CB 500", amount: 15000.00, date: "2024-01-15" },
+    { id: 2, type: "purchase", description: "Compra Yamaha FZ25", amount: -10000.00, date: "2024-01-10" },
+  ]);
+});
+
+app.get("/api/clients", authMiddleware, async (c) => {
+  // Retornar dados mockados para evitar 404 e permitir que o frontend carregue
+  return c.json([
+    { id: 1, name: "Cliente Teste", email: "cliente@teste.com", phone: "11999999999" },
+  ]);
+});
+
 // Motorcycle endpoints
 app.get("/api/motorcycles", async (c) => {
   const query = c.req.query();
