@@ -50,8 +50,8 @@ export default function MotorcycleCard({ motorcycle }: MotorcycleCardProps) {
         
         {/* Status Overlay */}
         {motorcycle.status === 'vendida' && (
-          <div className="absolute inset-0 flex items-center justify-center bg-red-600/70 backdrop-blur-sm z-10">
-            <span className="text-5xl font-black text-white tracking-widest transform rotate-[-15deg] opacity-90">
+          <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
+            <span className="text-7xl font-black text-red-600/70 tracking-widest transform rotate-[-20deg] opacity-90 border-4 border-red-600/70 px-8 py-4 rounded-lg shadow-2xl">
               VENDIDA
             </span>
           </div>
