@@ -747,7 +747,10 @@ app.delete("/api/motorcycles/:id/images/:imageName", authMiddleware, async (c) =
 });
 
 // ============================================
-// EXPORT HANDLER
+// EXPORT HANDLER FOR NETLIFY EDGE FUNCTIONS
 // ============================================
 
-export default app;
+// Netlify Edge Functions requer uma função como export default
+export default async (request: Request, context: any) => {
+  return app.fetch(request, context);
+};

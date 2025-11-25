@@ -18532,7 +18532,9 @@ app.delete("/api/motorcycles/:id/images/:imageName", authMiddleware, async (c) =
     return c.json({ error: "Erro interno no servidor" }, 500);
   }
 });
-var index_default = app;
+var index_default = async (request, context) => {
+  return app.fetch(request, context);
+};
 export {
   index_default as default
 };
