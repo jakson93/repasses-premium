@@ -259,60 +259,56 @@ export default function AdvancedMotorcycleManagement() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
+      {/* Filters, Search and New Button */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+        <div className="md:col-span-3 grid grid-cols-1 sm:grid-cols-3 gap-4">
+          {/* Search */}
+          <div className="relative">
+            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+            <input
+              type="text"
+              placeholder="Buscar por marca ou modelo..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full pl-12 pr-4 py-3 rounded-xl bg-black border border-yellow-500/30 text-white placeholder-gray-500 focus:outline-none focus:border-yellow-500 transition-colors duration-200"
+            />
+          </div>
 
+          {/* Status Filter */}
+          <select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            className="px-4 py-3 rounded-xl bg-black border border-yellow-500/30 text-white focus:outline-none focus:border-yellow-500 transition-colors duration-200"
+          >
+            <option value="all">Todos os Status</option>
+            <option value="disponivel">Disponível</option>
+            <option value="reservada">Reservada</option>
+            <option value="vendida">Vendida</option>
+            <option value="aguardando_pagamento">Aguardando Pagamento</option>
+          </select>
+
+          {/* Sort By */}
+          <select
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value)}
+            className="px-4 py-3 rounded-xl bg-black border border-yellow-500/30 text-white focus:outline-none focus:border-yellow-500 transition-colors duration-200"
+          >
+            <option value="newest">Mais Recente</option>
+            <option value="oldest">Mais Antigo</option>
+            <option value="price-asc">Preço (Menor)</option>
+            <option value="price-desc">Preço (Maior)</option>
+          </select>
         </div>
-        <button
-          onClick={() => setShowForm(!showForm)}
-          className="flex items-center space-x-2 px-6 py-3 rounded-xl premium-button text-black font-semibold shadow-lg shadow-yellow-500/30 transition-all duration-300"
-        >
-          {showForm ? <X className="w-5 h-5" /> : <Plus className="w-5 h-5" />}
-          <span>{showForm ? "Cancelar" : "Nova Moto"}</span>
-        </button>
-      </div>
 
-      {/* Filters and Search */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="relative">
-          <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-          <input
-            type="text"
-            placeholder="Buscar por marca ou modelo..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-12 pr-4 py-3 rounded-xl bg-black border border-yellow-500/30 text-white placeholder-gray-500 focus:outline-none focus:border-yellow-500 transition-colors duration-200"
-          />
-        </div>
-
-        <select
-          value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value)}
-          className="px-4 py-3 rounded-xl bg-black border border-yellow-500/30 text-white focus:outline-none focus:border-yellow-500 transition-colors duration-200"
-        >
-          <option value="all">Todos os Status</option>
-          <option value="disponivel">Disponível</option>
-          <option value="reservada">Reservada</option>
-          <option value="vendida">Vendida</option>
-          <option value="aguardando_pagamento">Aguardando Pagamento</option>
-        </select>
-
-        <select
-          value={sortBy}
-          onChange={(e) => setSortBy(e.target.value)}
-          className="px-4 py-3 rounded-xl bg-black border border-yellow-500/30 text-white focus:outline-none focus:border-yellow-500 transition-colors duration-200"
-        >
-          <option value="newest">Mais Recente</option>
-          <option value="oldest">Mais Antigo</option>
-          <option value="price-asc">Preço (Menor)</option>
-          <option value="price-desc">Preço (Maior)</option>
-        </select>
-      </div>
-
-      {/* Form */}
-      {showForm && (
-        <div className="premium-card p-8 rounded-xl">
+	        {/* New Moto Button */}
+	        <button
+	          onClick={() => setShowForm(!showForm)}
+	          className="flex items-center justify-center space-x-2 px-6 py-3 rounded-xl premium-button text-black font-semibold shadow-lg shadow-yellow-500/30 transition-all duration-300 w-full"
+	        >
+	          {showForm ? <X className="w-5 h-5" /> : <Plus className="w-5 h-5" />}
+	          <span>{showForm ? "Cancelar" : "Nova Moto"}</span>
+	        </button>
+	      </div>
           <h3 className="text-xl font-bold text-white mb-6">
             {editingId ? "Editar Moto" : "Cadastrar Nova Moto"}
           </h3>
