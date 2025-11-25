@@ -18,11 +18,8 @@ export const authMiddleware = createMiddleware<{ Variables: { user: any; supabas
     return c.json({ error: "Unauthorized: Missing token" }, 401);
   }
 
-  // Definir o token de autorização no cliente Supabase
-  supabase.auth.setAuth(token);
-
-  // Obter o usuário a partir do token (o Supabase faz a validação)
-  const { data: { user }, error: authError } = await supabase.auth.getUser();
+  // Usar o token para obter o usuário
+  const { data: { user }, error: authError } = await supabase.auth.getUser(token);
 
   if (authError || !user) {
     return c.json({ error: "Unauthorized: Invalid or expired token" }, 401);
