@@ -2,24 +2,17 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import { useAuth } from "@/react-app/contexts/AuthContext";
 import {
-  LayoutDashboard,
-  Car,
-  Users,
-  DollarSign,
-  Settings,
-  Shield,
-} from "lucide-react";
-import Header from "@/react-app/components/Header";
-import Footer from "@/react-app/components/Footer";
-import Dashboard from "@/react-app/components/Dashboard";
-import AdvancedMotorcycleManagement from "@/react-app/components/AdvancedMotorcycleManagement";
-import ClientManagement from "@/react-app/components/ClientManagement";
-import FinancialManagement from "@/react-app/components/FinancialManagement";
+	  Car,
+	  Shield,
+	} from "lucide-react";
+	import Header from "@/react-app/components/Header";
+	import Footer from "@/react-app/components/Footer";
+	import AdvancedMotorcycleManagement from "@/react-app/components/AdvancedMotorcycleManagement";
 
 export default function Admin() {
   const { user, isPending } = useAuth();
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState<'motos'>('motos');
+	  const [activeTab] = useState<'motos'>('motos');
 
   useEffect(() => {
     if (!isPending && !user) {
@@ -35,9 +28,7 @@ export default function Admin() {
     );
   }
 
-  const tabs = [
-    { id: 'motos', name: 'Gestão de Motos', icon: Car },
-  ];
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-black">
@@ -64,15 +55,10 @@ export default function Admin() {
 
           {/* Navigation Tabs (Removido) */}
 
-          {/* Content Area */}
-          <div className="min-h-[600px]">
-            <AdvancedMotorcycleManagement />
-          </div>
-                  Módulo de configurações será implementado em breve.
-                </p>
-              </div>
-            )}
-          </div>
+	          {/* Content Area */}
+	          <div className="min-h-[600px]">
+	            <AdvancedMotorcycleManagement />
+	          </div>
         </div>
       </div>
 
