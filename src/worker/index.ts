@@ -5,7 +5,7 @@ import { SupabaseClient } from "@supabase/supabase-js";
 
 import {
   CreateMotorcycleSchema,
-  UpdateMotorcycleSchema,
+
   MotorcycleFiltersSchema,
 
 
