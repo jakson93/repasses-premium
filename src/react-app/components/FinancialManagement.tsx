@@ -89,8 +89,16 @@ const [recordsData, summaryData] = await Promise.all([
 	        apiGet<FinancialSummary>("/api/financial/summary"),
 	      ]);
 
-	      setRecords(recordsData);
-	      setSummary(summaryData);
+		      setRecords(recordsData || []);
+		      setSummary(summaryData || {
+		        totalEntradas: 0,
+		        totalSaidas: 0,
+		        saldo: 0,
+		        transacoesHoje: 0,
+		        lucroMes: 0,
+		        gastosMes: 0,
+		        categorias: {},
+		      });
     } catch (error) {
       console.error("Failed to load financial data:", error);
       // Se houver erro, garante que o estado de carregamento seja falso e os dados sejam vazios
