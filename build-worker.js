@@ -6,7 +6,7 @@ build({
     '@': './src',
   },
   footer: {
-    js: "module.exports.handler = app.fetch;",
+    js: "module.exports.handler = app.fetch.bind(app);",
   },
   bundle: true,
   outfile: 'netlify/functions/index.js',
