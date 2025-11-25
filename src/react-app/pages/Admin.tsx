@@ -38,9 +38,7 @@ export default function Admin() {
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center justify-between mb-8">
             <div>
-              <h1 className="text-4xl md:text-5xl font-bold text-white mb-2 speed-text">
-                Gestão de Motos
-              </h1>
+
               <p className="text-xl text-gray-400">
                 Sistema Administrativo
               </p>

@@ -262,8 +262,7 @@ export default function AdvancedMotorcycleManagement() {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-bold text-white">Gestão Avançada de Motos</h2>
-          <p className="text-gray-400">Controle completo do estoque</p>
+
         </div>
         <button
           onClick={() => setShowForm(!showForm)}
