@@ -59,7 +59,7 @@ export default function Home() {
       </section>
 
       {/* ================================= DESTAQUE =============================== */}
-      {/* Aqui estamos ativando um leve -mt-4 para colar exatamente no fim da imagem */}
+      {/* Colado ao final da imagem sem cortar */}
       <section className="relative -mt-4 pb-10 px-4 sm:px-6 lg:px-8 bg-black">
         <div className="max-w-7xl mx-auto">
 
@@ -67,28 +67,25 @@ export default function Home() {
             <h2 className="text-3xl md:text-4xl font-bold text-white mb-2">
               Motos em Destaque
             </h2>
-
             <p className="text-lg text-gray-400">
               Selecionadas especialmente para você
             </p>
           </div>
 
-          {/* Cards */}
+          {/* Cards (ESTILO DO CATÁLOGO APLICADO) */}
           {loading ? (
             <div className="flex items-center justify-center py-16">
-              <div className="speed-loading rounded-full h-12 w-12"></div>
+              <div className="animate-spin rounded-full h-12 w-12 border-4 border-yellow-500 border-t-transparent"></div>
             </div>
           ) : featuredMotorcycles.length > 0 ? (
             <>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+              {/* 🔥 EXATAMENTE o mesmo grid do catálogo */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                 {featuredMotorcycles.map((motorcycle, index) => (
-                  <div
+                  <MotorcycleCard
                     key={motorcycle.id}
-                    className="speed-entry"
-                    style={{ animationDelay: `${index * 0.1}s` }}
-                  >
-                    <MotorcycleCard motorcycle={motorcycle} />
-                  </div>
+                    motorcycle={motorcycle}
+                  />
                 ))}
               </div>
 
