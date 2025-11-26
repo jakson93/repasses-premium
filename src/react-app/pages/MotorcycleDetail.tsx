@@ -206,18 +206,6 @@ export default function MotorcycleDetail() {
               </div>
 
               <div className="flex items-start space-x-3">
-                <Gauge className="w-6 h-6 text-amber-500 mt-1" />
-                <div>
-                  <p className="text-slate-400 text-sm">Cilindrada</p>
-                  <p className="text-white font-semibold">
-                    {motorcycle.displacement
-                      ? `${motorcycle.displacement}cc`
-                      : "N/A"}
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-start space-x-3">
                 <DollarSign className="w-6 h-6 text-amber-500 mt-1" />
                 <div>
                   <p className="text-slate-400 text-sm">Quilometragem</p>
