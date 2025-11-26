@@ -29,7 +29,7 @@ export default function Home() {
     <div className="min-h-screen bg-black">
       <Header />
 
-      {/* ================= HERO ================= */}
+      {/* ================================= HERO =============================== */}
       <section className="relative h-[100vh] overflow-hidden hidden sm:block">
 
         {/* Background */}
@@ -41,32 +41,33 @@ export default function Home() {
           }}
         ></div>
 
-        {/* Dark Fade to merge with next section */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-black/50 to-black"></div>
-
-        {/* Lights */}
+        {/* Light FX */}
         <div className="absolute inset-0 z-10">
-          <div className="absolute top-16 left-10 w-72 h-72 bg-yellow-500 opacity-5 blur-3xl rounded-full animate-pulse"></div>
-          <div className="absolute bottom-16 right-10 w-96 h-96 bg-yellow-400 opacity-5 blur-3xl rounded-full animate-pulse delay-1000"></div>
+          <div className="absolute top-16 left-10 w-72 h-72 bg-yellow-500 opacity-5 rounded-full blur-3xl animate-pulse"></div>
+          <div className="absolute bottom-16 right-10 w-96 h-96 bg-yellow-400 opacity-5 rounded-full blur-3xl animate-pulse delay-1000"></div>
         </div>
 
         {/* Scroll Indicator */}
-        <div className="absolute top-[55%] left-1/2 transform -translate-x-1/2 z-30">
+        <div className="absolute bottom-12 left-1/2 transform -translate-x-1/2 z-30">
           <div className="w-6 h-10 border-2 border-yellow-400 rounded-full flex justify-center animate-bounce">
             <div className="w-1 h-3 bg-yellow-400 rounded-full mt-2"></div>
           </div>
         </div>
 
+        {/* Bottom Fade */}
+        <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-black via-black/80 to-transparent"></div>
       </section>
 
-      {/* =============== DESTAQUE ================= */}
-      <section className="relative -mt-20 pb-10 px-4 sm:px-6 lg:px-8 bg-black">
-        <div className="max-w-7xl mx-auto pt-6">
+      {/* ================================= DESTAQUE =============================== */}
+      {/* Aqui estamos ativando um leve -mt-4 para colar exatamente no fim da imagem */}
+      <section className="relative -mt-4 pb-10 px-4 sm:px-6 lg:px-8 bg-black">
+        <div className="max-w-7xl mx-auto">
 
-          <div className="text-center mb-8">
+          <div className="text-center mb-6">
             <h2 className="text-3xl md:text-4xl font-bold text-white mb-2">
               Motos em Destaque
             </h2>
+
             <p className="text-lg text-gray-400">
               Selecionadas especialmente para você
             </p>
