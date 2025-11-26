@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router";
-import { ArrowRight, Zap } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import Header from "@/react-app/components/Header";
 import Footer from "@/react-app/components/Footer";
 import MotorcycleCard from "@/react-app/components/MotorcycleCard";
@@ -54,8 +54,12 @@ export default function Home() {
         {/* HERO CONTENT */}
         <div className="relative z-20 flex flex-col items-center justify-start h-full text-center px-4 sm:px-6 lg:px-8 pt-72">
           <div className="max-w-5xl">
-            <h1 className="text-4xl sm:text-5xl lg:text-7xl font-bold text-yellow-400 mb-6 leading-tight"></h1>
-            <p className="text-xl sm:text-2xl text-gray-200 mb-12 leading-relaxed max-w-3xl mx-auto"></p>
+            <h1 className="text-4xl sm:text-5xl lg:text-7xl font-bold text-yellow-400 mb-6 leading-tight">
+              Encontre sua próxima moto
+            </h1>
+            <p className="text-xl sm:text-2xl text-gray-200 mb-12 leading-relaxed max-w-3xl mx-auto">
+              Os melhores repasses selecionados especialmente para você
+            </p>
           </div>
         </div>
 
@@ -88,27 +92,29 @@ export default function Home() {
               <div className="speed-loading rounded-full h-12 w-12"></div>
             </div>
           ) : featuredMotorcycles.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-              {featuredMotorcycles.map((motorcycle, index) => (
-                <div
-                  key={motorcycle.id}
-                  className="speed-entry"
-                  style={{ animationDelay: `${index * 0.1}s` }}
+            <>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+                {featuredMotorcycles.map((motorcycle, index) => (
+                  <div
+                    key={motorcycle.id}
+                    className="speed-entry"
+                    style={{ animationDelay: `${index * 0.1}s` }}
+                  >
+                    <MotorcycleCard motorcycle={motorcycle} />
+                  </div>
+                ))}
+              </div>
+
+              <div className="text-center pt-4 pb-12">
+                <Link
+                  to="/catalog"
+                  className="inline-flex items-center space-x-2 px-8 py-3 rounded-xl premium-button text-black font-semibold shadow-lg shadow-yellow-500/30 transition-all duration-300"
                 >
-                  <MotorcycleCard motorcycle={motorcycle} />
-                </div>
-              ))}
-            </div>
-            
-            <div className="text-center pt-4 pb-12">
-              <Link
-                to="/catalog"
-                className="inline-flex items-center space-x-2 px-8 py-3 rounded-xl premium-button text-black font-semibold shadow-lg shadow-yellow-500/30 transition-all duration-300"
-              >
-                <span>Ver Todas as Motos</span>
-                <ArrowRight className="w-5 h-5" />
-              </Link>
-            </div>
+                  <span>Ver Todas as Motos</span>
+                  <ArrowRight className="w-5 h-5" />
+                </Link>
+              </div>
+            </>
           ) : (
             <div className="text-center py-8">
               <p className="text-gray-400 text-lg">Novas motos chegando em breve</p>
@@ -134,6 +140,7 @@ export default function Home() {
               <div className="text-gray-300 text-xs sm:text-sm md:text-base">Avaliação</div>
             </div>
           </div>
+
         </div>
       </section>
 
