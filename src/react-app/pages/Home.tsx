@@ -29,7 +29,7 @@ export default function Home() {
     <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-black">
       <Header />
 
-      {/* ================================= HERO DESKTOP =============================== */}
+      {/* ================================= HERO =============================== */}
       <section className="relative h-[100vh] overflow-hidden hidden sm:block">
 
         {/* Background */}
@@ -51,35 +51,23 @@ export default function Home() {
           <div className="absolute bottom-16 right-10 w-96 h-96 bg-yellow-400 opacity-5 rounded-full blur-3xl animate-pulse delay-1000"></div>
         </div>
 
-        {/* HERO CONTENT */}
-        <div className="relative z-20 flex flex-col items-center justify-start h-full text-center px-4 sm:px-6 lg:px-8 pt-72">
-          <div className="max-w-5xl">
-            <h1 className="text-4xl sm:text-5xl lg:text-7xl font-bold text-yellow-400 mb-6 leading-tight">
-              Encontre sua próxima moto
-            </h1>
-            <p className="text-xl sm:text-2xl text-gray-200 mb-12 leading-relaxed max-w-3xl mx-auto">
-              Os melhores repasses selecionados especialmente para você
-            </p>
-          </div>
-        </div>
-
-        {/* Scroll Indicator */}
-        <div className="absolute bottom-20 left-1/2 transform -translate-x-1/2 z-30">
-          <div className="w-6 h-10 border-2 border-yellow-400 rounded-full flex justify-center animate-bounce">
-            <div className="w-1 h-3 bg-yellow-400 rounded-full mt-2"></div>
+        {/* === Scroll Indicator (AGORA NO MEIO DA TELA) === */}
+        <div className="absolute inset-0 flex justify-center items-center z-30">
+          <div className="w-7 h-12 border-2 border-yellow-400 rounded-full flex justify-center animate-bounce">
+            <div className="w-1.5 h-4 bg-yellow-400 rounded-full mt-2"></div>
           </div>
         </div>
 
         {/* Bottom Fade */}
-        <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-black via-black/80 to-transparent z-15"></div>
+        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-black via-black/70 to-transparent z-20"></div>
       </section>
 
       {/* ================================= DESTAQUE =============================== */}
-      <section className="relative pt-8 pb-6 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-black via-gray-900/95 to-gray-900">
+      <section className="relative pt-2 pb-6 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-black via-gray-900/95 to-gray-900">
         <div className="max-w-7xl mx-auto">
 
-          <div className="text-center mb-6">
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-2 speed-text mt-20 sm:mt-10 md:mt-8 lg:mt-6">
+          <div className="text-center mb-6 mt-8">
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-2 speed-text">
               Motos em Destaque
             </h2>
 
