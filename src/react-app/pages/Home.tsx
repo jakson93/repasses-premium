@@ -29,7 +29,7 @@ export default function Home() {
     <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-black">
       <Header />
 
-      {/* ================================= HERO =============================== */}
+      {/* ================================= HERO DESKTOP =============================== */}
       <section className="relative h-[100vh] overflow-hidden hidden sm:block">
 
         {/* Background */}
@@ -51,22 +51,22 @@ export default function Home() {
           <div className="absolute bottom-16 right-10 w-96 h-96 bg-yellow-400 opacity-5 rounded-full blur-3xl animate-pulse delay-1000"></div>
         </div>
 
-        {/* === Scroll Indicator (AGORA NO MEIO DA TELA) === */}
-        <div className="absolute inset-0 flex justify-center items-center z-30">
-          <div className="w-7 h-12 border-2 border-yellow-400 rounded-full flex justify-center animate-bounce">
-            <div className="w-1.5 h-4 bg-yellow-400 rounded-full mt-2"></div>
+        {/* Scroll Indicator */}
+        <div className="absolute bottom-[45%] left-1/2 transform -translate-x-1/2 z-30">
+          <div className="w-6 h-10 border-2 border-yellow-400 rounded-full flex justify-center animate-bounce">
+            <div className="w-1 h-3 bg-yellow-400 rounded-full mt-2"></div>
           </div>
         </div>
 
         {/* Bottom Fade */}
-        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-black via-black/70 to-transparent z-20"></div>
+        <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-black via-black/80 to-transparent z-15"></div>
       </section>
 
       {/* ================================= DESTAQUE =============================== */}
-      <section className="relative pt-2 pb-6 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-black via-gray-900/95 to-gray-900">
+      <section className="relative -mt-24 pb-6 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-black via-gray-900/95 to-gray-900">
         <div className="max-w-7xl mx-auto">
 
-          <div className="text-center mb-6 mt-8">
+          <div className="text-center mb-6">
             <h2 className="text-3xl md:text-4xl font-bold text-white mb-2 speed-text">
               Motos em Destaque
             </h2>
@@ -81,7 +81,7 @@ export default function Home() {
             </div>
           ) : featuredMotorcycles.length > 0 ? (
             <>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8 mt-4">
                 {featuredMotorcycles.map((motorcycle, index) => (
                   <div
                     key={motorcycle.id}
@@ -93,7 +93,7 @@ export default function Home() {
                 ))}
               </div>
 
-              <div className="text-center pt-4 pb-12">
+              <div className="text-center pt-2 pb-10">
                 <Link
                   to="/catalog"
                   className="inline-flex items-center space-x-2 px-8 py-3 rounded-xl premium-button text-black font-semibold shadow-lg shadow-yellow-500/30 transition-all duration-300"
@@ -110,7 +110,7 @@ export default function Home() {
           )}
 
           {/* Quick Stats */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 max-w-4xl mx-auto">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 max-w-4xl mx-auto mt-6">
             <div className="bg-black/60 backdrop-blur-md p-4 sm:p-6 rounded-xl border border-yellow-500/30 transition-all hover:border-yellow-500/60 hover:scale-105">
               <div className="text-xl sm:text-2xl md:text-3xl font-bold text-yellow-400 mb-2">30+</div>
               <div className="text-gray-300 text-xs sm:text-sm md:text-base">Motos Disponíveis</div>
