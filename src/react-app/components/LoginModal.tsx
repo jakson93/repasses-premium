@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { X, Mail, Lock, User } from 'lucide-react';
+import { X, Mail, Lock } from 'lucide-react';
 import { useAuth } from '@/react-app/contexts/AuthContext';
 
 interface LoginModalProps {
@@ -8,13 +8,11 @@ interface LoginModalProps {
 }
 
 export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
-  const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [name, setName] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const { login, register } = useAuth();
+  const { login } = useAuth();
 
   if (!isOpen) return null;
 
@@ -24,15 +22,10 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
     setLoading(true);
 
     try {
-      if (isLogin) {
-        await login(email, password);
-      } else {
-        await register(email, password, name);
-      }
+      await login(email, password);
       onClose();
       setEmail('');
       setPassword('');
-      setName('');
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -51,9 +44,7 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
             <X className="w-5 h-5" />
           </button>
 
-          <h2 className="text-3xl font-bold text-white mb-6">
-            {isLogin ? 'Entrar' : 'Criar Conta'}
-          </h2>
+          <h2 className="text-3xl font-bold text-white mb-6">Entrar</h2>
 
           {error && (
             <div className="mb-4 p-4 rounded-lg bg-red-500/20 border border-red-500/50 text-red-400">
@@ -62,24 +53,8 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
           )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
-            {!isLogin && (
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Nome
-                </label>
-                <div className="relative">
-                  <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                  <input
-                    type="text"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    className="w-full pl-11 pr-4 py-3 rounded-lg bg-black border border-yellow-500/30 text-white placeholder-gray-500 focus:outline-none focus:border-yellow-500 transition-colors duration-200"
-                    placeholder="Seu nome"
-                  />
-                </div>
-              </div>
-            )}
 
+            {/* EMAIL */}
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-2">
                 Email
@@ -97,6 +72,7 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
               </div>
             </div>
 
+            {/* SENHA */}
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-2">
                 Senha
@@ -113,35 +89,18 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
                   minLength={6}
                 />
               </div>
-              {!isLogin && (
-                <p className="text-xs text-gray-400 mt-1">
-                  Mínimo de 6 caracteres
-                </p>
-              )}
             </div>
 
+            {/* BOTÃO ENTRAR */}
             <button
               type="submit"
               disabled={loading}
               className="w-full px-6 py-3 rounded-xl premium-button text-black font-semibold shadow-lg shadow-yellow-500/30 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? 'Carregando...' : isLogin ? 'Entrar' : 'Criar Conta'}
+              {loading ? 'Carregando...' : 'Entrar'}
             </button>
           </form>
 
-          <div className="mt-6 text-center">
-            <button
-              onClick={() => {
-                setIsLogin(!isLogin);
-                setError('');
-              }}
-              className="text-yellow-400 hover:text-yellow-300 transition-colors duration-200"
-            >
-              {isLogin
-                ? 'Não tem conta? Cadastre-se'
-                : 'Já tem conta? Faça login'}
-            </button>
-          </div>
         </div>
       </div>
     </div>
