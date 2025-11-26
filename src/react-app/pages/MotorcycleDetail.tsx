@@ -106,7 +106,7 @@ export default function MotorcycleDetail() {
               />
             </div>
 
-            {/* Right Column - Details & Actions */}
+            {/* Right Column - Details */}
             <div className="space-y-6">
               <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700">
                 <h1 className="text-3xl font-bold text-white mb-2">
@@ -129,6 +129,7 @@ export default function MotorcycleDetail() {
                 </div>
               </div>
 
+              {/* Financing Info */}
               {motorcycle.is_financed === 1 && (
                 <div className="bg-blue-500/10 backdrop-blur-sm rounded-xl p-6 border border-blue-500/20">
                   <h3 className="text-lg font-bold text-blue-400 mb-4">
@@ -147,7 +148,9 @@ export default function MotorcycleDetail() {
                       <div className="flex items-center justify-between">
                         <span className="text-slate-400">Parcela mensal:</span>
                         <span className="text-white font-semibold">
-                          {formatPrice(motorcycle.finance_monthly_payment)}
+                          {formatPrice(
+                            motorcycle.finance_monthly_payment
+                          )}
                         </span>
                       </div>
                     )}
@@ -155,14 +158,18 @@ export default function MotorcycleDetail() {
                       <div className="flex items-center justify-between">
                         <span className="text-slate-400">Saldo devedor:</span>
                         <span className="text-white font-semibold">
-                          {formatPrice(motorcycle.finance_total_remaining)}
+                          {formatPrice(
+                            motorcycle.finance_total_remaining
+                          )}
                         </span>
                       </div>
                     )}
                     {motorcycle.is_overdue === 1 ? (
                       <div className="flex items-center space-x-2 text-red-400 pt-2 border-t border-blue-500/20">
                         <AlertCircle className="w-5 h-5" />
-                        <span className="font-semibold">Parcelas atrasadas</span>
+                        <span className="font-semibold">
+                          Parcelas atrasadas
+                        </span>
                       </div>
                     ) : (
                       <div className="flex items-center space-x-2 text-green-400 pt-2 border-t border-blue-500/20">
@@ -170,6 +177,7 @@ export default function MotorcycleDetail() {
                         <span className="font-semibold">Em dia</span>
                       </div>
                     )}
+
                     {motorcycle.is_worth_financing === 1 && (
                       <div className="mt-3 p-3 rounded-lg bg-green-500/10 border border-green-500/20">
                         <p className="text-sm text-green-400">
@@ -183,12 +191,12 @@ export default function MotorcycleDetail() {
             </div>
           </div>
 
-          {/* Specifications Section */}
+          {/* Specifications */}
           <div className="mt-8 bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 md:p-8 border border-slate-700">
             <h2 className="text-2xl font-bold text-white mb-6">Especificações</h2>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
               <div className="flex items-start space-x-3">
-                <Calendar className="w-6 h-6 text-amber-500 mt-1 flex-shrink-0" />
+                <Calendar className="w-6 h-6 text-amber-500 mt-1" />
                 <div>
                   <p className="text-slate-400 text-sm">Ano</p>
                   <p className="text-white font-semibold">
@@ -198,17 +206,19 @@ export default function MotorcycleDetail() {
               </div>
 
               <div className="flex items-start space-x-3">
-                <Gauge className="w-6 h-6 text-amber-500 mt-1 flex-shrink-0" />
+                <Gauge className="w-6 h-6 text-amber-500 mt-1" />
                 <div>
                   <p className="text-slate-400 text-sm">Cilindrada</p>
                   <p className="text-white font-semibold">
-                    {motorcycle.displacement ? `${motorcycle.displacement}cc` : "N/A"}
+                    {motorcycle.displacement
+                      ? `${motorcycle.displacement}cc`
+                      : "N/A"}
                   </p>
                 </div>
               </div>
 
               <div className="flex items-start space-x-3">
-                <DollarSign className="w-6 h-6 text-amber-500 mt-1 flex-shrink-0" />
+                <DollarSign className="w-6 h-6 text-amber-500 mt-1" />
                 <div>
                   <p className="text-slate-400 text-sm">Quilometragem</p>
                   <p className="text-white font-semibold">
@@ -218,7 +228,7 @@ export default function MotorcycleDetail() {
               </div>
 
               <div className="flex items-start space-x-3">
-                <Palette className="w-6 h-6 text-amber-500 mt-1 flex-shrink-0" />
+                <Palette className="w-6 h-6 text-amber-500 mt-1" />
                 <div>
                   <p className="text-slate-400 text-sm">Cor</p>
                   <p className="text-white font-semibold">
@@ -229,17 +239,19 @@ export default function MotorcycleDetail() {
 
               {motorcycle.condition && (
                 <div className="flex items-start space-x-3">
-                  <CheckCircle className="w-6 h-6 text-amber-500 mt-1 flex-shrink-0" />
+                  <CheckCircle className="w-6 h-6 text-amber-500 mt-1" />
                   <div>
                     <p className="text-slate-400 text-sm">Conservação</p>
-                    <p className="text-white font-semibold">{motorcycle.condition}</p>
+                    <p className="text-white font-semibold">
+                      {motorcycle.condition}
+                    </p>
                   </div>
                 </div>
               )}
             </div>
           </div>
 
-          {/* Description Section */}
+          {/* Description */}
           {motorcycle.description && (
             <div className="mt-8 bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 md:p-8 border border-slate-700">
               <h2 className="text-2xl font-bold text-white mb-4">Descrição</h2>
@@ -249,19 +261,19 @@ export default function MotorcycleDetail() {
             </div>
           )}
 
-          {/* Features Section */}
+          {/* Features */}
           {motorcycle.features && (
             <div className="mt-8 bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 md:p-8 border border-slate-700">
               <h2 className="text-2xl font-bold text-white mb-4">
                 Opcionais e Recursos
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {motorcycle.features.split(",").map((feature: string, index: number) => (
+                {motorcycle.features.split(",").map((feature, index) => (
                   <div
                     key={index}
                     className="flex items-center space-x-2 text-slate-300"
                   >
-                    <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
+                    <CheckCircle className="w-5 h-5 text-green-500" />
                     <span>{feature.trim()}</span>
                   </div>
                 ))}
@@ -269,17 +281,46 @@ export default function MotorcycleDetail() {
             </div>
           )}
 
-          {/* Payment Methods Section */}
-          {motorcycle.payment_methods && (
-            <div className="mt-8 bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 md:p-8 border border-slate-700">
-              <h2 className="text-2xl font-bold text-white mb-4">
-                Formas de Pagamento
-              </h2>
-              <p className="text-slate-300 leading-relaxed">
-                {motorcycle.payment_methods}
-              </p>
+          {/* Payment Methods - NOVO LAYOUT PREMIUM */}
+          <div className="mt-8 bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 md:p-8 border border-slate-700">
+            <h2 className="text-2xl font-bold text-white mb-6">
+              Formas de Pagamento
+            </h2>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="flex items-center space-x-3">
+                <CheckCircle className="w-6 h-6 text-amber-500" />
+                <p className="text-slate-300 text-lg font-medium">
+                  Cartão de Crédito até 12x
+                </p>
+              </div>
+
+              <div className="flex items-center space-x-3">
+                <CheckCircle className="w-6 h-6 text-amber-500" />
+                <p className="text-slate-300 text-lg font-medium">
+                  Financiamento
+                </p>
+              </div>
+
+              <div className="flex items-center space-x-3">
+                <CheckCircle className="w-6 h-6 text-amber-500" />
+                <p className="text-slate-300 text-lg font-medium">
+                  Pagamento à Vista
+                </p>
+              </div>
+
+              <div className="flex items-center space-x-3">
+                <CheckCircle className="w-6 h-6 text-amber-500" />
+                <p className="text-slate-300 text-lg font-medium">
+                  Aceitamos Troca
+                </p>
+              </div>
             </div>
-          )}
+
+            <p className="mt-6 text-slate-400 text-sm italic">
+              ✔ Aceitamos vários tipos de negociação.
+            </p>
+          </div>
         </div>
       </div>
 
