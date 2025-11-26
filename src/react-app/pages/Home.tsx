@@ -52,7 +52,7 @@ export default function Home() {
         </div>
 
         {/* Scroll Indicator */}
-        <div className="absolute bottom-[45%] left-1/2 transform -translate-x-1/2 z-30">
+        <div className="absolute top-[50%] left-1/2 transform -translate-x-1/2 z-30">
           <div className="w-6 h-10 border-2 border-yellow-400 rounded-full flex justify-center animate-bounce">
             <div className="w-1 h-3 bg-yellow-400 rounded-full mt-2"></div>
           </div>
@@ -63,7 +63,7 @@ export default function Home() {
       </section>
 
       {/* ================================= DESTAQUE =============================== */}
-      <section className="relative -mt-24 pb-6 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-black via-gray-900/95 to-gray-900">
+      <section className="relative -mt-[40vh] pb-6 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-black via-gray-900/95 to-gray-900">
         <div className="max-w-7xl mx-auto">
 
           <div className="text-center mb-6">
