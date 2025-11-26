@@ -25,7 +25,7 @@ export default function Footer() {
           <div>
             <h3 className="text-white font-bold mb-6 text-lg">Contato Rápido</h3>
             <div className="space-y-4">
-              <a href="https://wa.me/5511999999999" target="_blank" rel="noopener noreferrer" className="flex items-center space-x-3 text-gray-400 hover:text-yellow-400 transition-all duration-300 group">
+              <a href="https://wa.me/5593991334064" target="_blank" rel="noopener noreferrer" className="flex items-center space-x-3 text-gray-400 hover:text-yellow-400 transition-all duration-300 group">
                 <div className="w-8 h-8 rounded-lg bg-green-500/20 flex items-center justify-center group-hover:bg-green-500/30 transition-colors duration-300">
                   <MessageCircle className="w-4 h-4 text-green-400" />
                 </div>
@@ -35,7 +35,7 @@ export default function Footer() {
                 </div>
               </a>
               
-              <a href="tel:+5511999999999" className="flex items-center space-x-3 text-gray-400 hover:text-yellow-400 transition-all duration-300 group">
+              <a href="tel:+5593991334064" className="flex items-center space-x-3 text-gray-400 hover:text-yellow-400 transition-all duration-300 group">
                 <div className="w-8 h-8 rounded-lg bg-blue-500/20 flex items-center justify-center group-hover:bg-blue-500/30 transition-colors duration-300">
                   <Phone className="w-4 h-4 text-blue-400" />
                 </div>
@@ -45,15 +45,7 @@ export default function Footer() {
                 </div>
               </a>
 
-              <a href="mailto:contato@repassespremium.com" className="flex items-center space-x-3 text-gray-400 hover:text-yellow-400 transition-all duration-300 group">
-                <div className="w-8 h-8 rounded-lg bg-yellow-500/20 flex items-center justify-center group-hover:bg-yellow-500/30 transition-colors duration-300">
-                  <Mail className="w-4 h-4 text-yellow-400" />
-                </div>
-                <div>
-                  <div className="text-sm font-medium">E-mail</div>
-                  <div className="text-xs text-gray-500">contato@repassespremium.com</div>
-                </div>
-              </a>
+
             </div>
           </div>
 

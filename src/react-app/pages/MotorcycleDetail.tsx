@@ -80,7 +80,7 @@ export default function MotorcycleDetail() {
   };
 
   const whatsappMessage = encodeURIComponent(
-    `Olá! Gostaria de saber mais sobre a ${motorcycle.brand} ${motorcycle.model} - ${motorcycle.year}`
+    `Olá! Gostaria de saber mais sobre a ${motorcycle.brand} ${motorcycle.model} - ${motorcycle.year}. Código: ${motorcycle.id}`
   );
 
   return (
@@ -118,21 +118,13 @@ export default function MotorcycleDetail() {
 
                 <div className="space-y-4">
                   <a
-                    href={`https://wa.me/?text=${whatsappMessage}`}
+                    href={`https://wa.me/5593991334064?text=${whatsappMessage}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center justify-center space-x-2 w-full px-6 py-3 rounded-lg bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold shadow-lg shadow-green-500/30 transition-all duration-200"
                   >
                     <MessageCircle className="w-5 h-5" />
-                    <span>Contatar via WhatsApp</span>
-                  </a>
-
-                  <a
-                    href="mailto:contato@repassespremium.com"
-                    className="flex items-center justify-center space-x-2 w-full px-6 py-3 rounded-lg bg-slate-700 hover:bg-slate-600 text-white font-semibold transition-all duration-200"
-                  >
-                    <Mail className="w-5 h-5" />
-                    <span>Enviar E-mail</span>
+                    <span>WhatsApp (93) 99133-4064</span>
                   </a>
                 </div>
               </div>

@@ -92,12 +92,22 @@ export default function Home() {
               {featuredMotorcycles.map((motorcycle, index) => (
                 <div
                   key={motorcycle.id}
-                  className="speed-entry motorcycle-hover"
+                  className="speed-entry"
                   style={{ animationDelay: `${index * 0.1}s` }}
                 >
                   <MotorcycleCard motorcycle={motorcycle} />
                 </div>
               ))}
+            </div>
+            
+            <div className="text-center pt-4 pb-12">
+              <Link
+                to="/catalog"
+                className="inline-flex items-center space-x-2 px-8 py-3 rounded-xl premium-button text-black font-semibold shadow-lg shadow-yellow-500/30 transition-all duration-300"
+              >
+                <span>Ver Todas as Motos</span>
+                <ArrowRight className="w-5 h-5" />
+              </Link>
             </div>
           ) : (
             <div className="text-center py-8">
