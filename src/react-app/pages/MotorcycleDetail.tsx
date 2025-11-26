@@ -51,7 +51,7 @@ export default function MotorcycleDetail() {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
         <Header />
-        <div className="pt-24 pb-12 px-4 sm:px-6 lg:px-8">
+        <div className="pt-28 pb-12 px-4 sm:px-6 lg:px-8">
           <div className="max-w-7xl mx-auto text-center py-20">
             <p className="text-slate-400 text-lg mb-4">Moto não encontrada</p>
             <Link
