@@ -60,7 +60,7 @@ export default function Home() {
 
       {/* ================================= DESTAQUE =============================== */}
       {/* Colado ao final da imagem sem cortar */}
-      <section className="relative -mt-4 pb-10 px-4 sm:px-6 lg:px-8 bg-black">
+      <section className="relative pt-20 sm:pt-0 -mt-4 pb-10 px-4 sm:px-6 lg:px-8 bg-black">
         <div className="max-w-7xl mx-auto">
 
           <div className="text-center mb-6">
