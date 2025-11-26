@@ -26,10 +26,10 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-black">
+    <div className="min-h-screen bg-black">
       <Header />
 
-      {/* ================================= HERO DESKTOP =============================== */}
+      {/* ================= HERO ================= */}
       <section className="relative h-[100vh] overflow-hidden hidden sm:block">
 
         {/* Background */}
@@ -41,37 +41,35 @@ export default function Home() {
           }}
         ></div>
 
-        {/* Gradients */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-transparent to-black/90"></div>
-        <div className="absolute inset-0 bg-gradient-to-r from-black/30 via-transparent to-black/30"></div>
+        {/* Dark Fade to merge with next section */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-black/50 to-black"></div>
 
-        {/* Light FX */}
+        {/* Lights */}
         <div className="absolute inset-0 z-10">
-          <div className="absolute top-16 left-10 w-72 h-72 bg-yellow-500 opacity-5 rounded-full blur-3xl animate-pulse"></div>
-          <div className="absolute bottom-16 right-10 w-96 h-96 bg-yellow-400 opacity-5 rounded-full blur-3xl animate-pulse delay-1000"></div>
+          <div className="absolute top-16 left-10 w-72 h-72 bg-yellow-500 opacity-5 blur-3xl rounded-full animate-pulse"></div>
+          <div className="absolute bottom-16 right-10 w-96 h-96 bg-yellow-400 opacity-5 blur-3xl rounded-full animate-pulse delay-1000"></div>
         </div>
 
         {/* Scroll Indicator */}
-        <div className="absolute top-[50%] left-1/2 transform -translate-x-1/2 z-30">
+        <div className="absolute top-[55%] left-1/2 transform -translate-x-1/2 z-30">
           <div className="w-6 h-10 border-2 border-yellow-400 rounded-full flex justify-center animate-bounce">
             <div className="w-1 h-3 bg-yellow-400 rounded-full mt-2"></div>
           </div>
         </div>
 
-        {/* Bottom Fade */}
-        <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-black via-black/80 to-transparent z-15"></div>
       </section>
 
-      {/* ================================= DESTAQUE =============================== */}
-      <section className="relative -mt-[40vh] pb-6 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-black via-gray-900/95 to-gray-900">
-        <div className="max-w-7xl mx-auto">
+      {/* =============== DESTAQUE ================= */}
+      <section className="relative -mt-20 pb-10 px-4 sm:px-6 lg:px-8 bg-black">
+        <div className="max-w-7xl mx-auto pt-6">
 
-          <div className="text-center mb-6">
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-2 speed-text">
+          <div className="text-center mb-8">
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-2">
               Motos em Destaque
             </h2>
-
-            <p className="text-lg text-gray-400">Selecionadas especialmente para você</p>
+            <p className="text-lg text-gray-400">
+              Selecionadas especialmente para você
+            </p>
           </div>
 
           {/* Cards */}
@@ -81,7 +79,7 @@ export default function Home() {
             </div>
           ) : featuredMotorcycles.length > 0 ? (
             <>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8 mt-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
                 {featuredMotorcycles.map((motorcycle, index) => (
                   <div
                     key={motorcycle.id}
@@ -108,26 +106,6 @@ export default function Home() {
               <p className="text-gray-400 text-lg">Novas motos chegando em breve</p>
             </div>
           )}
-
-          {/* Quick Stats */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 max-w-4xl mx-auto mt-6">
-            <div className="bg-black/60 backdrop-blur-md p-4 sm:p-6 rounded-xl border border-yellow-500/30 transition-all hover:border-yellow-500/60 hover:scale-105">
-              <div className="text-xl sm:text-2xl md:text-3xl font-bold text-yellow-400 mb-2">30+</div>
-              <div className="text-gray-300 text-xs sm:text-sm md:text-base">Motos Disponíveis</div>
-            </div>
-            <div className="bg-black/60 backdrop-blur-md p-4 sm:p-6 rounded-xl border border-yellow-500/30 transition-all hover:border-yellow-500/60 hover:scale-105">
-              <div className="text-xl sm:text-2xl md:text-3xl font-bold text-yellow-400 mb-2">100%</div>
-              <div className="text-gray-300 text-xs sm:text-sm md:text-base">Verificadas</div>
-            </div>
-            <div className="bg-black/60 backdrop-blur-md p-4 sm:p-6 rounded-xl border border-yellow-500/30 transition-all hover:border-yellow-500/60 hover:scale-105">
-              <div className="text-xl sm:text-2xl md:text-3xl font-bold text-yellow-400 mb-2">24h</div>
-              <div className="text-gray-300 text-xs sm:text-sm md:text-base">Resposta Rápida</div>
-            </div>
-            <div className="bg-black/60 backdrop-blur-md p-4 sm:p-6 rounded-xl border border-yellow-500/30 transition-all hover:border-yellow-500/60 hover:scale-105">
-              <div className="text-xl sm:text-2xl md:text-3xl font-bold text-yellow-400 mb-2">5★</div>
-              <div className="text-gray-300 text-xs sm:text-sm md:text-base">Avaliação</div>
-            </div>
-          </div>
 
         </div>
       </section>
