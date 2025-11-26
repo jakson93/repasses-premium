@@ -53,12 +53,16 @@ export default function Home() {
         {/* HERO CONTENT */}
         <div className="relative z-20 flex flex-col items-center justify-start h-full text-center px-4 sm:px-6 lg:px-8 pt-72">
           <div className="max-w-5xl">
-            <h1 className="text-4xl sm:text-5xl lg:text-7xl font-bold text-yellow-400 mb-6 leading-tight"></h1>
-            <p className="text-xl sm:text-2xl text-gray-200 mb-12 leading-relaxed max-w-3xl mx-auto"></p>
+            <h1 className="text-4xl sm:text-5xl lg:text-7xl font-bold text-yellow-400 mb-6 leading-tight">
+              Encontre sua próxima moto
+            </h1>
+            <p className="text-xl sm:text-2xl text-gray-200 mb-12 leading-relaxed max-w-3xl mx-auto">
+              Os melhores repasses selecionados com cuidado para você
+            </p>
           </div>
         </div>
 
-        {/* Scroll Indicator - Movido para mais acima */}
+        {/* Scroll Indicator */}
         <div className="absolute bottom-32 left-1/2 transform -translate-x-1/2 z-30">
           <div className="w-6 h-10 border-2 border-yellow-400 rounded-full flex justify-center animate-bounce">
             <div className="w-1 h-3 bg-yellow-400 rounded-full mt-2"></div>
@@ -99,10 +103,10 @@ export default function Home() {
                   </div>
                 ))}
               </div>
-              
+
               {/* Botão Ver Todas as Motos */}
               <div className="text-center mb-12">
-                <Link 
+                <Link
                   to="/catalog"
                   className="inline-flex items-center gap-2 bg-yellow-400 hover:bg-yellow-500 text-black font-bold py-4 px-8 rounded-lg transition-all transform hover:scale-105 shadow-lg hover:shadow-yellow-400/50"
                 >
@@ -118,10 +122,9 @@ export default function Home() {
               <div className="text-center py-8 mb-8">
                 <p className="text-gray-400 text-lg">Novas motos chegando em breve</p>
               </div>
-              
-              {/* Botão Ver Todas as Motos - mesmo quando não há motos em destaque */}
+
               <div className="text-center mb-12">
-                <Link 
+                <Link
                   to="/catalog"
                   className="inline-flex items-center gap-2 bg-yellow-400 hover:bg-yellow-500 text-black font-bold py-4 px-8 rounded-lg transition-all transform hover:scale-105 shadow-lg hover:shadow-yellow-400/50"
                 >
@@ -153,6 +156,7 @@ export default function Home() {
               <div className="text-gray-300 text-xs sm:text-sm md:text-base">Avaliação</div>
             </div>
           </div>
+
         </div>
       </section>
 
